@@ -1,0 +1,164 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radaxion Loader</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #1a1a1a;
+            font-family: Arial, sans-serif;
+            color: #ffffff;
+            overflow: hidden;
+        }
+        .container {
+            text-align: center;
+            background-color: #2c2c2c;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            color: #00ff88;
+        }
+        p {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+        }
+        .start-btn, .download-btn {
+            padding: 15px 30px;
+            font-size: 1.2em;
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .start-btn {
+            background-color: #007bff;
+        }
+        .start-btn:hover {
+            background-color: #0056b3;
+        }
+        .download-btn {
+            background-color: #ff4444;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+        .download-btn.active {
+            background-color: #00ff88;
+            cursor: pointer;
+            opacity: 1;
+        }
+        .download-btn.active:hover {
+            background-color: #00cc70;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Radaxion Loader</h1>
+        <p id="status">Please click the button below to start the audio.</p>
+        <button id="startBtn" class="start-btn">Start Audio</button>
+        <br><br>
+        <button id="downloadBtn" class="download-btn" disabled>Download File</button>
+    </div>
+
+    <audio id="backgroundAudio" style="display: none;">
+        <source src="https://files.catbox.moe/xos3lv.mp3" type="audio/mp3">
+        Your browser does not support the audio element.
+    </audio>
+
+    <script>
+        const audio = document.getElementById('backgroundAudio');
+        const startBtn = document.getElementById('startBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const statusText = document.getElementById('status');
+
+        // Başlat butonuna tıklama olayı
+        startBtn.onclick = function() {
+            startBtn.style.display = 'none'; // Başlat butonunu gizle
+            statusText.textContent = "Loading audio... Please wait.";
+            
+            // Ses dosyasını çal
+            audio.play().then(() => {
+                statusText.textContent = "Audio is playing... Please wait until it finishes.";
+            }).catch(error => {
+                console.error("Audio playback failed:", error);
+                statusText.textContent = "Error playing audio. The file may not be accessible.";
+                startBtn.style.display = 'block'; // Hata olursa başlat butonunu geri göster
+            });
+        };
+
+        // Ses bittiğinde indirme butonunu aktif et
+        audio.onended = function() {
+            statusText.textContent = "Audio finished! You can now download the file.";
+            downloadBtn.classList.add('active');
+            downloadBtn.disabled = false;
+
+            // İndirme butonuna tıklama olayı
+            downloadBtn.onclick = function() {
+                const fileUrl = 'YOUR_FILE_URL_HERE'; // İndirilecek dosyanın URL'sini buraya koy
+                const a = document.createElement('a');
+                a.href = fileUrl;
+                a.download = 'your-file-name.zip'; // Dosya adını buraya yaz
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            };
+        };
+
+        // Ses çalarken bir hata oluşursa
+        audio.onerror = function() {
+            statusText.textContent = "Error loading audio. The file may not be accessible.";
+            startBtn.style.display = 'block'; // Hata olursa başlat butonunu geri göster
+        };
+    </script>
+</body>
+</html>
