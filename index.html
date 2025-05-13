@@ -39,7 +39,7 @@
             font-size: 1.2em;
             margin-bottom: 30px;
         }
-        .start-btn, .download-btn {
+        .start-btn, .download-btn, .jjsploit-btn {
             padding: 15px 30px;
             font-size: 1.2em;
             color: #ffffff;
@@ -54,17 +54,17 @@
         .start-btn:hover {
             background-color: #0056b3;
         }
-        .download-btn {
+        .download-btn, .jjsploit-btn {
             background-color: #ff4444;
             cursor: not-allowed;
             opacity: 0.5;
         }
-        .download-btn.active {
+        .download-btn.active, .jjsploit-btn.active {
             background-color: #00ff88;
             cursor: pointer;
             opacity: 1;
         }
-        .download-btn.active:hover {
+        .download-btn.active:hover, .jjsploit-btn.active:hover {
             background-color: #00cc70;
         }
     </style>
@@ -75,7 +75,9 @@
         <p id="status">Please click the button below to start the audio.</p>
         <button id="startBtn" class="start-btn">Start Audio</button>
         <br><br>
-        <button id="downloadBtn" class="download-btn" disabled>Download File</button>
+        <button id="downloadBtn" class="download-btn" disabled>Radaxion Beta 1.1</button>
+        <br><br>
+        <button id="jjsploitBtn" class="jjsploit-btn" disabled>JJSploit</button>
     </div>
 
     <audio id="backgroundAudio" style="display: none;">
@@ -87,6 +89,7 @@
         const audio = document.getElementById('backgroundAudio');
         const startBtn = document.getElementById('startBtn');
         const downloadBtn = document.getElementById('downloadBtn');
+        const jjsploitBtn = document.getElementById('jjsploitBtn');
         const statusText = document.getElementById('status');
 
         // Başlat butonuna tıklama olayı
@@ -104,18 +107,31 @@
             });
         };
 
-        // Ses bittiğinde indirme butonunu aktif et
+        // Ses bittiğinde indirme butonlarını aktif et
         audio.onended = function() {
-            statusText.textContent = "Audio finished! You can now download the file.";
+            statusText.textContent = "Audio finished! You can now download the files.";
             downloadBtn.classList.add('active');
             downloadBtn.disabled = false;
+            jjsploitBtn.classList.add('active');
+            jjsploitBtn.disabled = false;
 
-            // İndirme butonuna tıklama olayı
+            // Radaxion Beta 1.1 indirme butonuna tıklama olayı
             downloadBtn.onclick = function() {
-                const fileUrl = 'https://files.catbox.moe/2us7jp.lua'; // İndirilecek dosyanın URL'sini buraya koy
+                const fileUrl = 'https://files.catbox.moe/2us7jp.lua'; // Radaxion Beta 1.1 dosyasının URL'si
                 const a = document.createElement('a');
                 a.href = fileUrl;
-                a.download = 'T7jF9bK1rQ2pW8mL3vZ4nX6yD0tH'; // Dosya adını buraya yaz
+                a.download = 'T7jF9bK1rQ2pW8mL3vZ4nX6yD0tH'; // Dosya adı
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            };
+
+            // JJSploit indirme butonuna tıklama olayı
+            jjsploitBtn.onclick = function() {
+                const fileUrl = 'YOUR_JJSPLOIT_DOWNLOAD_LINK_HERE'; // JJSploit dosyasının URL'sini buraya koy
+                const a = document.createElement('a');
+                a.href = fileUrl;
+                a.download = 'JJSploit'; // Dosya adı
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
