@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Radaxion</title>
     <style>
         body {
@@ -22,24 +22,34 @@
             padding: 40px;
             border-radius: 15px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            max-width: 400px;
+            width: 100%;
         }
         h1 {
             font-size: 2.5em;
             margin-bottom: 20px;
             color: #00ff88; /* Başlangıç rengi */
-            animation: rgbChange 5s infinite; /* RGB animasyonunu uygula */
+            animation: rgbChange 5s infinite;
         }
         @keyframes rgbChange {
-            0% { color: rgb(255, 0, 0); } /* Kırmızı */
-            33% { color: rgb(0, 255, 0); } /* Yeşil */
-            66% { color: rgb(0, 0, 255); } /* Mavi */
-            100% { color: rgb(255, 0, 0); } /* Kırmızı (döngü tamamlanır) */
+            0% { color: rgb(255, 0, 0); }
+            33% { color: rgb(0, 255, 0); }
+            66% { color: rgb(0, 0, 255); }
+            100% { color: rgb(255, 0, 0); }
         }
         p {
             font-size: 1.2em;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
-        .start-btn, .download-btn, .jjsploit-btn {
+        input[type="text"], input[type="password"] {
+            width: 80%;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border: none;
+            font-size: 1em;
+        }
+        .start-btn, .download-btn, .jjsploit-btn, .login-btn {
             padding: 15px 30px;
             font-size: 1.2em;
             color: #ffffff;
@@ -47,9 +57,17 @@
             border-radius: 10px;
             cursor: pointer;
             transition: all 0.3s ease;
+            margin-top: 15px;
+        }
+        .login-btn {
+            background-color: #007bff;
+        }
+        .login-btn:hover {
+            background-color: #0056b3;
         }
         .start-btn {
             background-color: #007bff;
+            display: none; /* Başlangıçta gizli olacak */
         }
         .start-btn:hover {
             background-color: #0056b3;
@@ -58,6 +76,7 @@
             background-color: #ff4444;
             cursor: not-allowed;
             opacity: 0.5;
+            margin-top: 10px;
         }
         .download-btn.active, .jjsploit-btn.active {
             background-color: #00ff88;
@@ -67,81 +86,118 @@
         .download-btn.active:hover, .jjsploit-btn.active:hover {
             background-color: #00cc70;
         }
+        .error {
+            color: #ff4444;
+            font-weight: bold;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Radaxion Loader</h1>
-        <p id="status">Please click the button below to start the audio.</p>
+        <p id="status">Lütfen kullanıcı adı ve şifrenizi girin.</p>
+
+        <input type="text" id="userid" placeholder="User ID" autocomplete="off" />
+        <br />
+        <input type="password" id="password" placeholder="Password" autocomplete="off" />
+        <br />
+        <button id="loginBtn" class="login-btn">Login</button>
+
         <button id="startBtn" class="start-btn">Start Audio</button>
         <br><br>
         <button id="downloadBtn" class="download-btn" disabled>Radaxion Beta 1.2</button>
         <br><br>
         <button id="jjsploitBtn" class="jjsploit-btn" disabled>JJSploit</button>
+
+        <p id="errorMsg" class="error"></p>
     </div>
 
     <audio id="backgroundAudio" style="display: none;">
-        <source src="https://files.catbox.moe/ldwwcx.wav" type="audio/mp3">
+        <source src="https://files.catbox.moe/ldwwcx.wav" type="audio/mp3" />
         Your browser does not support the audio element.
     </audio>
 
     <script>
-        const audio = document.getElementById('backgroundAudio');
-        const startBtn = document.getElementById('startBtn');
-        const downloadBtn = document.getElementById('downloadBtn');
-        const jjsploitBtn = document.getElementById('jjsploitBtn');
-        const statusText = document.getElementById('status');
+        const correctUserId = "user123";  // Buraya istediğin kullanıcı adını yaz
+        const correctPass = "pass123";    // Buraya istediğin şifreyi yaz
 
-        // Başlat butonuna tıklama olayı
-        startBtn.onclick = function() {
-            startBtn.style.display = 'none'; // Başlat butonunu gizle
-            statusText.textContent = "Loading audio... Please wait.";
-            
-            // Ses dosyasını çal
-            audio.play().then(() => {
-                statusText.textContent = "Audio is playing... Please wait until it finishes.";
-            }).catch(error => {
-                console.error("Audio playback failed:", error);
-                statusText.textContent = "Error playing audio. The file may not be accessible.";
-                startBtn.style.display = 'block'; // Hata olursa başlat butonunu geri göster
-            });
+        const audio = document.getElementById("backgroundAudio");
+        const startBtn = document.getElementById("startBtn");
+        const downloadBtn = document.getElementById("downloadBtn");
+        const jjsploitBtn = document.getElementById("jjsploitBtn");
+        const statusText = document.getElementById("status");
+
+        const loginBtn = document.getElementById("loginBtn");
+        const useridInput = document.getElementById("userid");
+        const passInput = document.getElementById("password");
+        const errorMsg = document.getElementById("errorMsg");
+
+        // Login butonu
+        loginBtn.onclick = function () {
+            const enteredUserId = useridInput.value.trim();
+            const enteredPass = passInput.value.trim();
+
+            if (enteredUserId === correctUserId && enteredPass === correctPass) {
+                errorMsg.textContent = "";
+                statusText.textContent = "Giriş başarılı! Şimdi 'Start Audio' butonuna basabilirsiniz.";
+                loginBtn.style.display = "none";
+                useridInput.style.display = "none";
+                passInput.style.display = "none";
+                startBtn.style.display = "inline-block";
+            } else {
+                errorMsg.textContent = "Hatalı kullanıcı adı veya şifre!";
+            }
         };
 
-        // Ses bittiğinde indirme butonlarını aktif et
-        audio.onended = function() {
+        // Start audio butonu
+        startBtn.onclick = function () {
+            startBtn.style.display = "none";
+            statusText.textContent = "Loading audio... Please wait.";
+
+            audio.play()
+                .then(() => {
+                    statusText.textContent = "Audio is playing... Please wait until it finishes.";
+                })
+                .catch((error) => {
+                    console.error("Audio playback failed:", error);
+                    statusText.textContent = "Error playing audio. The file may not be accessible.";
+                    startBtn.style.display = "inline-block";
+                });
+        };
+
+        // Ses bittiğinde butonları aktif et
+        audio.onended = function () {
             statusText.textContent = "Audio finished! You can now download the files.";
-            downloadBtn.classList.add('active');
+            downloadBtn.classList.add("active");
             downloadBtn.disabled = false;
-            jjsploitBtn.classList.add('active');
+            jjsploitBtn.classList.add("active");
             jjsploitBtn.disabled = false;
 
-            // Radaxion Beta 1.1 indirme butonuna tıklama olayı
-            downloadBtn.onclick = function() {
-                const fileUrl = 'https://files.catbox.moe/zzxwgp.lua'; // Radaxion Beta 1.1 dosyasının URL'si
-                const a = document.createElement('a');
+            downloadBtn.onclick = function () {
+                const fileUrl = "https://files.catbox.moe/zzxwgp.lua";
+                const a = document.createElement("a");
                 a.href = fileUrl;
-                a.download = 'T7jF9bK1rQ2pW8mL3vZ4nX6yD0tH'; // Dosya adı
+                a.download = "T7jF9bK1rQ2pW8mL3vZ4nX6yD0tH";
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
             };
 
-            // JJSploit indirme butonuna tıklama olayı
-            jjsploitBtn.onclick = function() {
-                const fileUrl = 'https://files.catbox.moe/7d5o58.msi'; // JJSploit dosyasının URL'sini buraya koy
-                const a = document.createElement('a');
+            jjsploitBtn.onclick = function () {
+                const fileUrl = "https://files.catbox.moe/7d5o58.msi";
+                const a = document.createElement("a");
                 a.href = fileUrl;
-                a.download = 'JJSploit'; // Dosya adı
+                a.download = "JJSploit";
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
             };
         };
 
-        // Ses çalarken bir hata oluşursa
-        audio.onerror = function() {
+        audio.onerror = function () {
             statusText.textContent = "Error loading audio. The file may not be accessible.";
-            startBtn.style.display = 'block'; // Hata olursa başlat butonunu geri göster
+            startBtn.style.display = "inline-block";
         };
     </script>
 </body>
