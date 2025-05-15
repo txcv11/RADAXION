@@ -1,318 +1,336 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Radaxion</title>
-    <style>
-        body {
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #1a1a1a;
-            font-family: Arial, sans-serif;
-            color: #ffffff;
-            overflow: hidden;
-        }
-        .container {
-            text-align: center;
-            background-color: #2c2c2c;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-            max-width: 400px;
-            width: 100%;
-        }
-        h1 {
-            font-size: 2.5em;
-            margin-bottom: 20px;
-            color: #00ff88;
-            animation: rgbChange 5s infinite;
-        }
-        @keyframes rgbChange {
-            0% { color: rgb(255, 0, 0); }
-            33% { color: rgb(0, 255, 0); }
-            66% { color: rgb(0, 0, 255); }
-            100% { color: rgb(255, 0, 0); }
-        }
-        p {
-            font-size: 1.2em;
-            margin-bottom: 20px;
-        }
-        input[type="text"], input[type="password"] {
-            width: 80%;
-            padding: 10px;
-            margin: 8px 0;
-            border-radius: 8px;
-            border: none;
-            font-size: 1em;
-        }
-        .btn {
-            padding: 15px 30px;
-            font-size: 1.2em;
-            color: #ffffff;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 15px;
-        }
-        .login-btn {
-            background-color: #007bff;
-        }
-        .login-btn:hover {
-            background-color: #0056b3;
-        }
-        .start-btn {
-            background-color: #007bff;
-            display: none;
-        }
-        .start-btn:hover {
-            background-color: #0056b3;
-        }
-        .download-btn, .jjsploit-btn {
-            background-color: #ff4444;
-            cursor: not-allowed;
-            opacity: 0.5;
-            margin-top: 10px;
-        }
-        .download-btn.active, .jjsploit-btn.active {
-            background-color: #00ff88;
-            cursor: pointer;
-            opacity: 1;
-        }
-        .download-btn.active:hover, .jjsploit-btn.active:hover {
-            background-color: #00cc70;
-        }
-        .error {
-            color: #ff4444;
-            font-weight: bold;
-            margin-top: 10px;
-        }
-        .toggle-link {
-            color: #00ff88;
-            cursor: pointer;
-            margin-top: 15px;
-            display: inline-block;
-            text-decoration: underline;
-        }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Radaxion Loader</title>
+<style>
+  /* Reset & base */
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    height: 100vh;
+    background: #121212;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #eee;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  .container {
+    background: #222;
+    padding: 40px 50px;
+    border-radius: 15px;
+    width: 350px;
+    box-shadow: 0 0 30px #00ff88aa;
+    text-align: center;
+  }
+
+  h1 {
+    font-size: 2.8em;
+    margin-bottom: 15px;
+    background: linear-gradient(90deg, #ff004c, #00ff88, #004cff);
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradientShift 5s ease infinite;
+  }
+
+  @keyframes gradientShift {
+    0% {background-position: 0% 50%;}
+    50% {background-position: 100% 50%;}
+    100% {background-position: 0% 50%;}
+  }
+
+  p#status {
+    font-size: 1.1em;
+    margin-bottom: 25px;
+    min-height: 24px;
+  }
+
+  input[type="text"], input[type="password"] {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 15px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    outline: none;
+    transition: box-shadow 0.3s ease;
+  }
+
+  input[type="text"]:focus, input[type="password"]:focus {
+    box-shadow: 0 0 10px #00ff88;
+    background-color: #111;
+  }
+
+  button {
+    width: 100%;
+    padding: 14px;
+    font-size: 1.2em;
+    margin-bottom: 15px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    color: #fff;
+    font-weight: 600;
+  }
+
+  button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .btn-primary {
+    background-color: #007bff;
+    box-shadow: 0 0 8px #007bffaa;
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    background-color: #0056b3;
+    box-shadow: 0 0 15px #0056b3aa;
+  }
+
+  .btn-secondary {
+    background-color: #ff4444;
+    box-shadow: 0 0 8px #ff4444aa;
+  }
+
+  .btn-secondary:hover:not(:disabled) {
+    background-color: #cc0000;
+    box-shadow: 0 0 15px #cc0000aa;
+  }
+
+  .btn-active {
+    background-color: #00ff88;
+    box-shadow: 0 0 15px #00ff88aa;
+    color: #000;
+  }
+
+  .btn-active:hover {
+    background-color: #00cc70;
+    box-shadow: 0 0 20px #00cc70aa;
+    color: #000;
+  }
+
+  .tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+
+  .tab {
+    flex: 1;
+    padding: 10px 0;
+    cursor: pointer;
+    background: #111;
+    border-radius: 10px 10px 0 0;
+    font-weight: 700;
+    transition: background-color 0.3s ease;
+    color: #888;
+  }
+
+  .tab.active {
+    background: #00ff88;
+    color: #000;
+    box-shadow: 0 0 10px #00ff88aa;
+  }
+
+  .tab:not(:last-child) {
+    margin-right: 10px;
+  }
+
+  .hidden {
+    display: none;
+  }
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>Radaxion Loader</h1>
-        <p id="status">Lütfen giriş yapın veya üye olun.</p>
+<div class="container">
+  <h1>Radaxion Loader</h1>
 
-        <!-- Login form -->
-        <div id="loginForm">
-            <input type="text" id="loginUserId" placeholder="User ID" autocomplete="off" />
-            <br />
-            <input type="password" id="loginPassword" placeholder="Password" autocomplete="off" />
-            <br />
-            <button id="loginBtn" class="btn login-btn">Login</button>
-            <div class="toggle-link" id="showRegister">Üye Ol</div>
-            <p id="loginError" class="error"></p>
-        </div>
+  <div class="tabs">
+    <div id="loginTab" class="tab active">Login</div>
+    <div id="registerTab" class="tab">Register</div>
+  </div>
 
-        <!-- Register form -->
-        <div id="registerForm" style="display:none;">
-            <input type="text" id="registerUserId" placeholder="Yeni User ID" autocomplete="off" />
-            <br />
-            <input type="password" id="registerPassword" placeholder="Yeni Password" autocomplete="off" />
-            <br />
-            <button id="registerBtn" class="btn login-btn">Kayıt Ol</button>
-            <div class="toggle-link" id="showLogin">Giriş Yap</div>
-            <p id="registerError" class="error"></p>
-        </div>
+  <!-- Login Form -->
+  <form id="loginForm">
+    <input type="text" id="loginUser" placeholder="Username" required autocomplete="username" />
+    <input type="password" id="loginPass" placeholder="Password" required autocomplete="current-password" />
+    <button type="submit" class="btn-primary">Login</button>
+  </form>
 
-        <button id="startBtn" class="start-btn">Start Audio</button>
-        <br><br>
-        <button id="downloadBtn" class="download-btn" disabled>Radaxion Beta 1.2</button>
-        <br><br>
-        <button id="jjsploitBtn" class="jjsploit-btn" disabled>JJSploit</button>
-    </div>
+  <!-- Register Form -->
+  <form id="registerForm" class="hidden">
+    <input type="text" id="registerUser" placeholder="Choose a username" required autocomplete="username" />
+    <input type="password" id="registerPass" placeholder="Choose a password" required autocomplete="new-password" />
+    <button type="submit" class="btn-primary">Register</button>
+  </form>
 
-    <audio id="backgroundAudio" style="display: none;">
-        <source src="https://files.catbox.moe/ldwwcx.wav" type="audio/mp3" />
-        Your browser does not support the audio element.
-    </audio>
+  <p id="status">Please login or register to unlock the downloads.</p>
 
-    <script>
-        const audio = document.getElementById("backgroundAudio");
-        const startBtn = document.getElementById("startBtn");
-        const downloadBtn = document.getElementById("downloadBtn");
-        const jjsploitBtn = document.getElementById("jjsploitBtn");
-        const statusText = document.getElementById("status");
+  <button id="startBtn" class="btn-primary" style="margin-top: 10px;">Start Audio</button>
 
-        // Formlar ve mesajlar
-        const loginForm = document.getElementById("loginForm");
-        const registerForm = document.getElementById("registerForm");
+  <button id="downloadBtn" class="btn-secondary" disabled>Radaxion Beta 1.2</button>
+  <button id="jjsploitBtn" class="btn-secondary" disabled style="margin-top: 10px;">JJSploit</button>
+</div>
 
-        const loginUserId = document.getElementById("loginUserId");
-        const loginPassword = document.getElementById("loginPassword");
-        const loginBtn = document.getElementById("loginBtn");
-        const loginError = document.getElementById("loginError");
+<audio id="backgroundAudio" style="display:none;">
+  <source src="https://files.catbox.moe/ldwwcx.wav" type="audio/mp3" />
+  Your browser does not support the audio element.
+</audio>
 
-        const registerUserId = document.getElementById("registerUserId");
-        const registerPassword = document.getElementById("registerPassword");
-        const registerBtn = document.getElementById("registerBtn");
-        const registerError = document.getElementById("registerError");
+<script>
+  // Tab switching logic
+  const loginTab = document.getElementById('loginTab');
+  const registerTab = document.getElementById('registerTab');
+  const loginForm = document.getElementById('loginForm');
+  const registerForm = document.getElementById('registerForm');
+  const statusText = document.getElementById('status');
 
-        const showRegister = document.getElementById("showRegister");
-        const showLogin = document.getElementById("showLogin");
+  loginTab.onclick = () => {
+    loginTab.classList.add('active');
+    registerTab.classList.remove('active');
+    loginForm.classList.remove('hidden');
+    registerForm.classList.add('hidden');
+    statusText.textContent = "Please login or register to unlock the downloads.";
+  };
 
-        // Kullanıcı verilerini localStorage'da saklamak için anahtar
-        const usersKey = "radaxionUsers";
+  registerTab.onclick = () => {
+    registerTab.classList.add('active');
+    loginTab.classList.remove('active');
+    registerForm.classList.remove('hidden');
+    loginForm.classList.add('hidden');
+    statusText.textContent = "Please login or register to unlock the downloads.";
+  };
 
-        // LocalStorage'dan kullanıcıları al
-        function getUsers() {
-            const usersJSON = localStorage.getItem(usersKey);
-            if (usersJSON) {
-                return JSON.parse(usersJSON);
-            }
-            return {};
-        }
+  // LocalStorage users key
+  const USERS_KEY = 'radaxionUsers';
 
-        // Kullanıcıları localStorage'a kaydet
-        function saveUsers(users) {
-            localStorage.setItem(usersKey, JSON.stringify(users));
-        }
+  // Utility: Load users from localStorage
+  function loadUsers() {
+    const data = localStorage.getItem(USERS_KEY);
+    return data ? JSON.parse(data) : {};
+  }
 
-        // Üye olma formunu göster
-        showRegister.onclick = function() {
-            loginForm.style.display = "none";
-            registerForm.style.display = "block";
-            statusText.textContent = "Lütfen yeni hesap oluşturun.";
-            loginError.textContent = "";
-            registerError.textContent = "";
-        };
+  // Utility: Save users to localStorage
+  function saveUsers(users) {
+    localStorage.setItem(USERS_KEY, JSON.stringify(users));
+  }
 
-        // Giriş formunu göster
-        showLogin.onclick = function() {
-            registerForm.style.display = "none";
-            loginForm.style.display = "block";
-            statusText.textContent = "Lütfen giriş yapın.";
-            loginError.textContent = "";
-            registerError.textContent = "";
-        };
+  // Register form submission
+  registerForm.onsubmit = (e) => {
+    e.preventDefault();
+    const username = document.getElementById('registerUser').value.trim();
+    const password = document.getElementById('registerPass').value.trim();
 
-        // Kayıt olma işlemi
-        registerBtn.onclick = function() {
-            const newUser = registerUserId.value.trim();
-            const newPass = registerPassword.value.trim();
+    if (!username || !password) {
+      statusText.textContent = "Please enter both username and password.";
+      return;
+    }
 
-            if (newUser === "" || newPass === "") {
-                registerError.textContent = "Lütfen tüm alanları doldurun.";
-                return;
-            }
+    let users = loadUsers();
+    if (users[username]) {
+      statusText.textContent = "Username already exists. Please choose another.";
+      return;
+    }
 
-            let users = getUsers();
+    users[username] = password;
+    saveUsers(users);
+    statusText.textContent = `User "${username}" registered successfully! You can now login.`;
+    registerForm.reset();
 
-            if (users[newUser]) {
-                registerError.textContent = "Bu kullanıcı adı zaten alınmış.";
-                return;
-            }
+    // Switch to login tab automatically
+    loginTab.click();
+  };
 
-            // Yeni kullanıcıyı ekle
-            users[newUser] = newPass;
-            saveUsers(users);
+  // Login form submission
+  loginForm.onsubmit = (e) => {
+    e.preventDefault();
+    const username = document.getElementById('loginUser').value.trim();
+    const password = document.getElementById('loginPass').value.trim();
 
-            registerError.style.color = "lightgreen";
-            registerError.textContent = "Kayıt başarılı! Şimdi giriş yapabilirsiniz.";
+    let users = loadUsers();
+    if (users[username] && users[username] === password) {
+      statusText.textContent = `Welcome back, ${username}! Please start the audio to unlock downloads.`;
+      loggedIn = true;
+      currentUser = username;
+      loginForm.reset();
+      registerForm.reset();
+      startBtn.disabled = false;
+      return;
+    }
+    statusText.textContent = "Invalid username or password.";
+  };
 
-            // Formu temizle
-            registerUserId.value = "";
-            registerPassword.value = "";
+  // Audio & download buttons logic
+  const audio = document.getElementById('backgroundAudio');
+  const startBtn = document.getElementById('startBtn');
+  const downloadBtn = document.getElementById('downloadBtn');
+  const jjsploitBtn = document.getElementById('jjsploitBtn');
 
-            setTimeout(() => {
-                registerForm.style.display = "none";
-                loginForm.style.display = "block";
-                statusText.textContent = "Lütfen giriş yapın.";
-                registerError.textContent = "";
-                registerError.style.color = "#ff4444";
-            }, 2000);
-        };
+  let loggedIn = false;
+  let currentUser = null;
 
-        // Giriş yapma işlemi
-        loginBtn.onclick = function() {
-            const enteredUser = loginUserId.value.trim();
-            const enteredPass = loginPassword.value.trim();
+  // Initially disable start audio button until login
+  startBtn.disabled = true;
 
-            if (enteredUser === "" || enteredPass === "") {
-                loginError.textContent = "Lütfen kullanıcı adı ve şifre girin.";
-                return;
-            }
+  startBtn.onclick = () => {
+    if (!loggedIn) {
+      statusText.textContent = "You must login first!";
+      return;
+    }
 
-            const users = getUsers();
+    startBtn.style.display = 'none';
+    statusText.textContent = "Loading audio... Please wait.";
 
-            if (users[enteredUser] && users[enteredUser] === enteredPass) {
-                loginError.textContent = "";
-                statusText.textContent = "Giriş başarılı! Şimdi 'Start Audio' butonuna basabilirsiniz.";
+    audio.play().then(() => {
+      statusText.textContent = "Audio is playing... Please wait until it finishes.";
+    }).catch(error => {
+      console.error("Audio playback failed:", error);
+      statusText.textContent = "Error playing audio. The file may not be accessible.";
+      startBtn.style.display = 'block';
+    });
+  };
 
-                // Formları gizle, start butonunu göster
-                loginForm.style.display = "none";
-                registerForm.style.display = "none";
-                startBtn.style.display = "inline-block";
+  audio.onended = () => {
+    statusText.textContent = "Audio finished! You can now download the files.";
+    downloadBtn.disabled = false;
+    downloadBtn.classList.add('btn-active');
+    jjsploitBtn.disabled = false;
+    jjsploitBtn.classList.add('btn-active');
+  };
 
-                // Giriş bilgilerini temizle
-                loginUserId.value = "";
-                loginPassword.value = "";
-            } else {
-                loginError.textContent = "Kullanıcı adı veya şifre hatalı!";
-            }
-        };
+  audio.onerror = () => {
+    statusText.textContent = "Error loading audio. The file may not be accessible.";
+    startBtn.style.display = 'block';
+  };
 
-        // Start audio butonu
-        startBtn.onclick = function() {
-            startBtn.style.display = "none";
-            statusText.textContent = "Loading audio... Please wait.";
+  downloadBtn.onclick = () => {
+    const fileUrl = 'https://files.catbox.moe/zzxwgp.lua';
+    const a = document.createElement('a');
+    a.href = fileUrl;
+    a.download = 'T7jF9bK1rQ2pW8mL3vZ4nX6yD0tH.lua';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
 
-            audio.play()
-                .then(() => {
-                    statusText.textContent = "Audio is playing... Please wait until it finishes.";
-                })
-                .catch((error) => {
-                    console.error("Audio playback failed:", error);
-                    statusText.textContent = "Error playing audio. The file may not be accessible.";
-                    startBtn.style.display = "inline-block";
-                });
-        };
-
-        // Ses bittiğinde butonları aktif et
-        audio.onended = function() {
-            statusText.textContent = "Audio finished! You can now download the files.";
-            downloadBtn.classList.add("active");
-            downloadBtn.disabled = false;
-            jjsploitBtn.classList.add("active");
-            jjsploitBtn.disabled = false;
-
-            downloadBtn.onclick = function() {
-                const fileUrl = "https://files.catbox.moe/zzxwgp.lua";
-                const a = document.createElement("a");
-                a.href = fileUrl;
-                a.download = "T7jF9bK1rQ2pW8mL3vZ4nX6yD0tH";
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-            };
-
-            jjsploitBtn.onclick = function() {
-                const fileUrl = "https://files.catbox.moe/7d5o58.msi";
-                const a = document.createElement("a");
-                a.href = fileUrl;
-                a.download = "JJSploit";
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-            };
-        };
-
-        audio.onerror = function() {
-            statusText.textContent = "Error loading audio. The file may not be accessible.";
-            startBtn.style.display = "inline-block";
-        };
-    </script>
+  jjsploitBtn.onclick = () => {
+    const fileUrl = 'https://files.catbox.moe/7d5o58.msi';
+    const a = document.createElement('a');
+    a.href = fileUrl;
+    a.download = 'JJSploit.msi';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+</script>
 </body>
 </html>
