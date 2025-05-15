@@ -28,7 +28,7 @@
         h1 {
             font-size: 2.5em;
             margin-bottom: 20px;
-            color: #00ff88; /* Başlangıç rengi */
+            color: #00ff88;
             animation: rgbChange 5s infinite;
         }
         @keyframes rgbChange {
@@ -49,7 +49,7 @@
             border: none;
             font-size: 1em;
         }
-        .start-btn, .download-btn, .jjsploit-btn, .login-btn {
+        .btn {
             padding: 15px 30px;
             font-size: 1.2em;
             color: #ffffff;
@@ -67,7 +67,7 @@
         }
         .start-btn {
             background-color: #007bff;
-            display: none; /* Başlangıçta gizli olacak */
+            display: none;
         }
         .start-btn:hover {
             background-color: #0056b3;
@@ -91,26 +91,47 @@
             font-weight: bold;
             margin-top: 10px;
         }
+        .toggle-link {
+            color: #00ff88;
+            cursor: pointer;
+            margin-top: 15px;
+            display: inline-block;
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Radaxion Loader</h1>
-        <p id="status">Lütfen kullanıcı adı ve şifrenizi girin.</p>
+        <p id="status">Lütfen giriş yapın veya üye olun.</p>
 
-        <input type="text" id="userid" placeholder="User ID" autocomplete="off" />
-        <br />
-        <input type="password" id="password" placeholder="Password" autocomplete="off" />
-        <br />
-        <button id="loginBtn" class="login-btn">Login</button>
+        <!-- Login form -->
+        <div id="loginForm">
+            <input type="text" id="loginUserId" placeholder="User ID" autocomplete="off" />
+            <br />
+            <input type="password" id="loginPassword" placeholder="Password" autocomplete="off" />
+            <br />
+            <button id="loginBtn" class="btn login-btn">Login</button>
+            <div class="toggle-link" id="showRegister">Üye Ol</div>
+            <p id="loginError" class="error"></p>
+        </div>
+
+        <!-- Register form -->
+        <div id="registerForm" style="display:none;">
+            <input type="text" id="registerUserId" placeholder="Yeni User ID" autocomplete="off" />
+            <br />
+            <input type="password" id="registerPassword" placeholder="Yeni Password" autocomplete="off" />
+            <br />
+            <button id="registerBtn" class="btn login-btn">Kayıt Ol</button>
+            <div class="toggle-link" id="showLogin">Giriş Yap</div>
+            <p id="registerError" class="error"></p>
+        </div>
 
         <button id="startBtn" class="start-btn">Start Audio</button>
         <br><br>
         <button id="downloadBtn" class="download-btn" disabled>Radaxion Beta 1.2</button>
         <br><br>
         <button id="jjsploitBtn" class="jjsploit-btn" disabled>JJSploit</button>
-
-        <p id="errorMsg" class="error"></p>
     </div>
 
     <audio id="backgroundAudio" style="display: none;">
@@ -119,39 +140,132 @@
     </audio>
 
     <script>
-        const correctUserId = "user123";  // Buraya istediğin kullanıcı adını yaz
-        const correctPass = "pass123";    // Buraya istediğin şifreyi yaz
-
         const audio = document.getElementById("backgroundAudio");
         const startBtn = document.getElementById("startBtn");
         const downloadBtn = document.getElementById("downloadBtn");
         const jjsploitBtn = document.getElementById("jjsploitBtn");
         const statusText = document.getElementById("status");
 
+        // Formlar ve mesajlar
+        const loginForm = document.getElementById("loginForm");
+        const registerForm = document.getElementById("registerForm");
+
+        const loginUserId = document.getElementById("loginUserId");
+        const loginPassword = document.getElementById("loginPassword");
         const loginBtn = document.getElementById("loginBtn");
-        const useridInput = document.getElementById("userid");
-        const passInput = document.getElementById("password");
-        const errorMsg = document.getElementById("errorMsg");
+        const loginError = document.getElementById("loginError");
 
-        // Login butonu
-        loginBtn.onclick = function () {
-            const enteredUserId = useridInput.value.trim();
-            const enteredPass = passInput.value.trim();
+        const registerUserId = document.getElementById("registerUserId");
+        const registerPassword = document.getElementById("registerPassword");
+        const registerBtn = document.getElementById("registerBtn");
+        const registerError = document.getElementById("registerError");
 
-            if (enteredUserId === correctUserId && enteredPass === correctPass) {
-                errorMsg.textContent = "";
+        const showRegister = document.getElementById("showRegister");
+        const showLogin = document.getElementById("showLogin");
+
+        // Kullanıcı verilerini localStorage'da saklamak için anahtar
+        const usersKey = "radaxionUsers";
+
+        // LocalStorage'dan kullanıcıları al
+        function getUsers() {
+            const usersJSON = localStorage.getItem(usersKey);
+            if (usersJSON) {
+                return JSON.parse(usersJSON);
+            }
+            return {};
+        }
+
+        // Kullanıcıları localStorage'a kaydet
+        function saveUsers(users) {
+            localStorage.setItem(usersKey, JSON.stringify(users));
+        }
+
+        // Üye olma formunu göster
+        showRegister.onclick = function() {
+            loginForm.style.display = "none";
+            registerForm.style.display = "block";
+            statusText.textContent = "Lütfen yeni hesap oluşturun.";
+            loginError.textContent = "";
+            registerError.textContent = "";
+        };
+
+        // Giriş formunu göster
+        showLogin.onclick = function() {
+            registerForm.style.display = "none";
+            loginForm.style.display = "block";
+            statusText.textContent = "Lütfen giriş yapın.";
+            loginError.textContent = "";
+            registerError.textContent = "";
+        };
+
+        // Kayıt olma işlemi
+        registerBtn.onclick = function() {
+            const newUser = registerUserId.value.trim();
+            const newPass = registerPassword.value.trim();
+
+            if (newUser === "" || newPass === "") {
+                registerError.textContent = "Lütfen tüm alanları doldurun.";
+                return;
+            }
+
+            let users = getUsers();
+
+            if (users[newUser]) {
+                registerError.textContent = "Bu kullanıcı adı zaten alınmış.";
+                return;
+            }
+
+            // Yeni kullanıcıyı ekle
+            users[newUser] = newPass;
+            saveUsers(users);
+
+            registerError.style.color = "lightgreen";
+            registerError.textContent = "Kayıt başarılı! Şimdi giriş yapabilirsiniz.";
+
+            // Formu temizle
+            registerUserId.value = "";
+            registerPassword.value = "";
+
+            setTimeout(() => {
+                registerForm.style.display = "none";
+                loginForm.style.display = "block";
+                statusText.textContent = "Lütfen giriş yapın.";
+                registerError.textContent = "";
+                registerError.style.color = "#ff4444";
+            }, 2000);
+        };
+
+        // Giriş yapma işlemi
+        loginBtn.onclick = function() {
+            const enteredUser = loginUserId.value.trim();
+            const enteredPass = loginPassword.value.trim();
+
+            if (enteredUser === "" || enteredPass === "") {
+                loginError.textContent = "Lütfen kullanıcı adı ve şifre girin.";
+                return;
+            }
+
+            const users = getUsers();
+
+            if (users[enteredUser] && users[enteredUser] === enteredPass) {
+                loginError.textContent = "";
                 statusText.textContent = "Giriş başarılı! Şimdi 'Start Audio' butonuna basabilirsiniz.";
-                loginBtn.style.display = "none";
-                useridInput.style.display = "none";
-                passInput.style.display = "none";
+
+                // Formları gizle, start butonunu göster
+                loginForm.style.display = "none";
+                registerForm.style.display = "none";
                 startBtn.style.display = "inline-block";
+
+                // Giriş bilgilerini temizle
+                loginUserId.value = "";
+                loginPassword.value = "";
             } else {
-                errorMsg.textContent = "Hatalı kullanıcı adı veya şifre!";
+                loginError.textContent = "Kullanıcı adı veya şifre hatalı!";
             }
         };
 
         // Start audio butonu
-        startBtn.onclick = function () {
+        startBtn.onclick = function() {
             startBtn.style.display = "none";
             statusText.textContent = "Loading audio... Please wait.";
 
@@ -167,14 +281,14 @@
         };
 
         // Ses bittiğinde butonları aktif et
-        audio.onended = function () {
+        audio.onended = function() {
             statusText.textContent = "Audio finished! You can now download the files.";
             downloadBtn.classList.add("active");
             downloadBtn.disabled = false;
             jjsploitBtn.classList.add("active");
             jjsploitBtn.disabled = false;
 
-            downloadBtn.onclick = function () {
+            downloadBtn.onclick = function() {
                 const fileUrl = "https://files.catbox.moe/zzxwgp.lua";
                 const a = document.createElement("a");
                 a.href = fileUrl;
@@ -184,7 +298,7 @@
                 document.body.removeChild(a);
             };
 
-            jjsploitBtn.onclick = function () {
+            jjsploitBtn.onclick = function() {
                 const fileUrl = "https://files.catbox.moe/7d5o58.msi";
                 const a = document.createElement("a");
                 a.href = fileUrl;
@@ -195,7 +309,7 @@
             };
         };
 
-        audio.onerror = function () {
+        audio.onerror = function() {
             statusText.textContent = "Error loading audio. The file may not be accessible.";
             startBtn.style.display = "inline-block";
         };
