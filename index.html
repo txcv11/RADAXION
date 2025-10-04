@@ -2,265 +2,103 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>Aşkıma Özel 💖</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Site Bakımda</title>
 <style>
   body {
     margin: 0;
-    padding: 0;
-    background: linear-gradient(to bottom, #ffdde1, #ee9ca7);
-    font-family: 'Segoe UI', Tahoma, sans-serif;
+    height: 100vh;
+    background: linear-gradient(135deg, #1e1e2f, #2a2a4a);
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    color: #f0f0f0;
+    font-family: "Poppins", sans-serif;
     text-align: center;
-    color: #fff;
-    overflow: hidden;
-    position: relative;
   }
+
+  h1 {
+    font-size: 3em;
+    margin-bottom: 0.2em;
+  }
+
   p {
-    font-size: 1.3rem;
-    margin: 20px;
-    line-height: 1.8;
-    max-width: 700px;
+    font-size: 1.2em;
+    margin-bottom: 2em;
+    color: #c9c9d9;
   }
-  button {
-    background: #fff;
-    color: #ee9ca7;
-    border: none;
-    padding: 15px 30px;
-    font-size: 1.3rem;
-    border-radius: 30px;
-    cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    transition: all 0.3s;
-    margin-top: 15px;
-    z-index: 2;
-    position: relative;
-  }
-  button:hover {
-    background: #ffdee2;
-    transform: scale(1.1);
-  }
-  #message { display: none; z-index:2; position:relative; animation:fadeIn 2s ease; }
-  #okBtn { display:inline-block; margin-top:20px; }
-  #gallery {
-    display: none;
-    z-index: 1;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top:0; left:0;
-    overflow:hidden;
-  }
-  #gallery img {
-    position: absolute;
-    width: 300px;
-    height: auto;
-    border-radius: 15px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-    opacity: 0;
-    animation: scrollPhoto 30s linear forwards;
-    z-index: 1;
-  }
-  @keyframes scrollPhoto {
-    0% {opacity:0; transform: translateY(20vh) scale(0.8);}
-    10% {opacity:1;}
-    90% {opacity:1;}
-    100% {opacity:0; transform: translateY(-100vh) scale(0.8);}
-  }
-  #loveText {
-    position: absolute;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 1.2rem;
-    color: #fff;
-    background: rgba(238, 156, 167, 0.5);
-    padding: 20px 30px;
-    border-radius: 15px;
-    width: 85%;
-    max-width: 900px;
-    line-height: 1.8;
-    text-align: center;
-    z-index: 2;
-    white-space: pre-wrap;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-  }
-  #finalMessage {
-    display:none;
-    position:absolute;
-    top:50%;
-    left:50%;
-    transform:translate(-50%,-50%);
-    font-size:2.5rem;
-    font-weight:bold;
-    color:#fff;
-    text-shadow:0 0 20px #ff6fa1;
-    animation: fadeIn 3s ease forwards;
-    z-index:3;
-  }
-  @keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
-  @keyframes fadeOut { from {opacity:1;} to {opacity:0;} }
-  .heart {
-    position: absolute;
-    width: 20px; height: 20px;
-    background: rgba(255,0,100,0.7);
-    transform: rotate(45deg);
-    top:-50px;
-    animation: fall 10s linear infinite;
-    z-index:1;
-  }
-  .heart:before, .heart:after {
-    content:"";
-    position:absolute;
-    width:20px; height:20px;
-    background: rgba(255,0,100,0.7);
-    border-radius:50%;
-  }
-  .heart:before { top:-10px; left:0; }
-  .heart:after { left:10px; top:0; }
-  @keyframes fall { 0%{transform:translateY(-50px) rotate(45deg); opacity:0;} 10%{opacity:1;} 100%{transform:translateY(110vh) rotate(45deg); opacity:0;} }
-  #passwordSection {
+
+  #countdown {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    z-index: 10;
+    gap: 1.5em;
+    font-size: 1.5em;
+    font-weight: 500;
   }
-  #passwordInput {
-    padding: 10px;
-    font-size: 1.2rem;
-    border-radius: 10px;
-    border: none;
-    margin-bottom: 10px;
+
+  .time-box {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 1em 1.2em;
+    border-radius: 1em;
+    backdrop-filter: blur(6px);
+    min-width: 90px;
   }
-  #passwordError {
-    color: #ff6fa1;
-    font-size: 1rem;
-    display: none;
+
+  .time-box span {
+    display: block;
+    font-size: 0.8em;
+    margin-top: 0.4em;
+    color: #aaa;
+  }
+
+  footer {
+    position: absolute;
+    bottom: 20px;
+    font-size: 0.9em;
+    color: #888;
   }
 </style>
 </head>
 <body>
-<div id="passwordSection">
-  <input type="password" id="passwordInput" placeholder="Şifre giriniz...">
-  <button id="submitPassword">Giriş Yap 💕</button>
-  <div id="passwordError">Bence Kaandan şifreyi istemelisin!</div>
-</div>
-<div id="message" style="display: none;">
-<p>
-Aşkımmm… ❤️<br><br>
-Seninle geçirdiğim bu 4 yıl, hayatımın en güzel yılları oldu.
-Her günüm senin gülüşünle güzelleşti, seninle her şey anlam kazandı.
-Sen yanımdayken dünya daha renkli, zaman daha hızlı geçiyor.
-<br><br>
-İyi ki varsın, iyi ki seni tanımışım.
-Seninle geçireceğim daha nice yıllarımız olsun…
-Kalbimin her atışında adın var, her nefesimde senin sevgin. 💕
-</p>
-<button id="okBtn">Devam Et 💕</button>
-</div>
-<div id="gallery" style="display: none;"></div>
-<div id="loveText"></div>
-<div id="finalMessage">💖 Seni Sonsuza Dek Seviyorum 💖</div>
-<audio id="bgMusic" src="https://files.catbox.moe/m3p0io.mp3"></audio>
-<script>
-const passwordSection = document.getElementById('passwordSection');
-const passwordInput = document.getElementById('passwordInput');
-const submitPassword = document.getElementById('submitPassword');
-const passwordError = document.getElementById('passwordError');
-const message = document.getElementById('message');
-const okBtn = document.getElementById('okBtn');
-const gallery = document.getElementById('gallery');
-const loveText = document.getElementById('loveText');
-const finalMessage = document.getElementById('finalMessage');
-const music = document.getElementById('bgMusic');
-// Fotoğraf listesi
-const photos = [
-  "https://i.ibb.co/9my8VKwG/foto1.jpg",
-  "https://i.ibb.co/hRjtTyVY/foto2.jpg",
-  "https://i.ibb.co/6Rct0MW1/foto3.jpg",
-  "https://i.ibb.co/XZkn3NJF/foto4.jpg",
-  "https://i.ibb.co/9k79CsTZ/foto5.jpg",
-  "https://i.ibb.co/JWjZCRmb/IMG-5040.jpg"
-];
-// Uzun romantik metin
-const loveParagraph = `Aşkım,
-Seninle geçirdiğim her gün, hayatımın en özel armağanı oldu. Senin gülüşün, kalbimin en karanlık anlarını bile aydınlatan bir güneş gibi parlıyor. Yanında olduğumda tüm dertler kayboluyor, sadece huzur kalıyor. Sen benim en güvenli limanım, en güzel yolculuğum ve en kıymetli hayalim oldun.
-Senin gözlerine her baktığımda, içinde kaybolduğum sınırsız bir evren görüyorum. O gözlerde hem geleceğim hem de geçmişim var. Bazen sadece sessizce yanında oturmak, tüm dünyadaki mutluluğun bana yettiğini hissettiriyor.
-Birlikte geçen dört yılımız, bana gösterdi ki gerçek mutluluk çok uzaklarda değilmiş. Mutluluk, seninle aynı yolda yürümekmiş. Mutluluk, sabah gözlerimi açtığımda aklıma gelen ilk şeyin sen olmanmış. Mutluluk, kalbimin ritmini senin adınla tutmasıymış.
-Seninle birlikteyken zaman çok hızlı geçiyor, ama her saniyesi sonsuz bir değer taşıyor. Düşünsene, daha önümüzde yaşayacağımız o kadar çok anı, o kadar çok kahkaha, o kadar çok sarılma var ki… Hayalini kurduğumuz günler, birlikte kurduğumuz düşler gerçeğe dönüşmek için bizi bekliyor.
-İyi ki varsın, iyi ki benim hayatımdasın. Sen benim en büyük şansım, en büyük mucizemsin. Bir ömrüm olsa, bin ömrüm olsa, hepsini seninle geçirmek isterim. Seni sevmek, bana verilmiş en güzel hediye. Ve bil ki, kalbim atmaya devam ettiği sürece seni sevmekten asla vazgeçmeyecek.
-Her yeni gün seninle daha da anlam kazanıyor, her bakışın içimde yeni bir bahar açtırıyor. Seninle geçirdiğim her an, bir önceki anı gölgede bırakıyor. Birlikte kurduğumuz hayaller, her geçen gün daha da büyüyor ve ben bu hayalleri seninle gerçekleştirmenin heyecanını yaşıyorum.
-Seninle geçirdiğim her anı bir hazine gibi saklıyorum kalbimde. Senin sesin, gülüşün, dokunuşun benim için birer mucize. Birlikte geçirdiğimiz bu dört yıl, bana sevginin ne kadar güçlü ve derin olduğunu öğretti. Seninle her an, her saniye, ömrümün en güzel parçası.
-Gelecekte de seninle el ele yürümek, her zorluğu seninle aşmak istiyorum. Seninle geçireceğim her gün, benim için bir sevgi destanı olacak. Seni sevmek, hayatımın en büyük tutkusu, en güzel gerçeği. Kalbim her zaman seninle atacak, her nefeste adın yankılanacak.
-Şimdi gözlerimi kapatıyorum ve geleceğimizi hayal ediyorum. El ele, yan yana, omuz omuza… Ne olursa olsun, birlikte aşacağımız tüm engelleri düşünüyorum. Ve emin ol, birlikte olduğumuz sürece hiçbir şey bizi yıkamayacak. Çünkü biz, birbirimize aitiz.`;
-// Şifre kontrolü
-submitPassword.addEventListener('click', () => {
-  if (passwordInput.value === 'huzur') {
-    passwordSection.style.display = 'none';
-    message.style.display = 'block';
-    music.play().catch(err => console.log(err));
-    createHearts();
-  } else {
-    passwordError.style.display = 'block';
-  }
-});
-// Okudum
-okBtn.addEventListener('click', () => {
-  message.style.display = 'none';
-  gallery.style.display = 'block';
-  typeWriter(loveParagraph, 0);
-  showFloatingPhotos();
-});
-// Typewriter efekt
-function typeWriter(text, index) {
-  if (index < text.length) {
-    loveText.innerHTML += text.charAt(index);
-    index++;
-    setTimeout(() => typeWriter(text, index), 40);
-  } else {
-    setTimeout(() => { 
-      finalMessage.style.display = 'block'; 
-      setTimeout(() => {
-        finalMessage.style.animation = 'fadeOut 3s ease forwards';
-        setTimeout(() => { finalMessage.style.display = 'none'; }, 3000);
-      }, 5000);
-    }, 2000);
-  }
-}
-// Fotoğrafları kenarlardan akıt
-function showFloatingPhotos() {
-  let isLeft = true;
-  let photoIndex = 0;
-  setInterval(() => {
-    const img = document.createElement('img');
-    img.src = photos[photoIndex % photos.length];
-    photoIndex++;
-    const loveTextRect = loveText.getBoundingClientRect();
-    if (isLeft) {
-      img.style.left = `${loveTextRect.left - 320}px`;
-    } else {
-      img.style.left = `${loveTextRect.right + 20}px`;
+
+  <h1>🚧 Site Bakımda</h1>
+  <p>Sitemiz şu anda bakımda. En kısa sürede geri döneceğiz!</p>
+
+  <div id="countdown">
+    <div class="time-box"><div id="days">00</div><span>Gün</span></div>
+    <div class="time-box"><div id="hours">00</div><span>Saat</span></div>
+    <div class="time-box"><div id="minutes">00</div><span>Dakika</span></div>
+    <div class="time-box"><div id="seconds">00</div><span>Saniye</span></div>
+  </div>
+
+  <footer>© 2025 - Tüm hakları saklıdır.</footer>
+
+  <script>
+    // Şu andan itibaren 72 saat sonrası
+    const targetTime = new Date().getTime() + (72 * 60 * 60 * 1000);
+
+    function updateCountdown() {
+      const now = new Date().getTime();
+      const distance = targetTime - now;
+
+      if (distance < 0) {
+        document.getElementById("countdown").innerHTML = "Bakım tamamlandı!";
+        return;
+      }
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      document.getElementById("days").innerText = String(days).padStart(2, '0');
+      document.getElementById("hours").innerText = String(hours).padStart(2, '0');
+      document.getElementById("minutes").innerText = String(minutes).padStart(2, '0');
+      document.getElementById("seconds").innerText = String(seconds).padStart(2, '0');
     }
-    img.style.top = '20vh';
-    gallery.appendChild(img);
-    setTimeout(() => { img.remove(); }, 30000);
-    isLeft = !isLeft;
-  }, 3000);
-}
-// Kalp yağmuru
-function createHearts() {
-  setInterval(() => {
-    const heart = document.createElement('div');
-    heart.classList.add('heart');
-    heart.style.left = Math.random() * 100 + 'vw';
-    heart.style.animationDuration = (5 + Math.random() * 5) + 's';
-    document.body.appendChild(heart);
-    setTimeout(() => heart.remove(), 10000);
-  }, 400);
-}
-</script>
+
+    setInterval(updateCountdown, 1000);
+  </script>
+
 </body>
 </html>
