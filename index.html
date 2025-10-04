@@ -62,7 +62,7 @@
 <body>
 
   <h1>🚧 Site Bakımda</h1>
-  <p>Sitemiz şu anda bakımda. En kısa sürede geri döneceğiz!</p>
+  <p>Sitemiz şu anda bakımda. En kısa sürede geri düzelticem bebeğim!</p>
 
   <div id="countdown">
     <div class="time-box"><div id="days">00</div><span>Gün</span></div>
@@ -74,14 +74,15 @@
   <footer>© 2025 - Tüm hakları saklıdır.</footer>
 
   <script>
-    // Şu andan itibaren 72 saat sonrası
-    const targetTime = new Date().getTime() + (72 * 60 * 60 * 1000);
+    // 🌍 Global sayaç için sabit bitiş tarihi
+    // Örneğin şu an 5 Ekim 2025 ise, 3 gün sonrası 8 Ekim 2025 00:00
+    const targetTime = new Date("2025-10-08T00:00:00").getTime();
 
     function updateCountdown() {
       const now = new Date().getTime();
       const distance = targetTime - now;
 
-      if (distance < 0) {
+      if (distance <= 0) {
         document.getElementById("countdown").innerHTML = "Bakım tamamlandı!";
         return;
       }
@@ -97,6 +98,7 @@
       document.getElementById("seconds").innerText = String(seconds).padStart(2, '0');
     }
 
+    updateCountdown();
     setInterval(updateCountdown, 1000);
   </script>
 
