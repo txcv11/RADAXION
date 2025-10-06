@@ -1,106 +1,354 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Site Bakımda</title>
-<style>
-  body {
-    margin: 0;
-    height: 100vh;
-    background: linear-gradient(135deg, #1e1e2f, #2a2a4a);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    color: #f0f0f0;
-    font-family: "Poppins", sans-serif;
-    text-align: center;
-  }
-
-  h1 {
-    font-size: 3em;
-    margin-bottom: 0.2em;
-  }
-
-  p {
-    font-size: 1.2em;
-    margin-bottom: 2em;
-    color: #c9c9d9;
-  }
-
-  #countdown {
-    display: flex;
-    gap: 1.5em;
-    font-size: 1.5em;
-    font-weight: 500;
-  }
-
-  .time-box {
-    background: rgba(255, 255, 255, 0.1);
-    padding: 1em 1.2em;
-    border-radius: 1em;
-    backdrop-filter: blur(6px);
-    min-width: 90px;
-  }
-
-  .time-box span {
-    display: block;
-    font-size: 0.8em;
-    margin-top: 0.4em;
-    color: #aaa;
-  }
-
-  footer {
-    position: absolute;
-    bottom: 20px;
-    font-size: 0.9em;
-    color: #888;
-  }
-</style>
+    <meta charset="UTF-8">
+    <title>Kum Kalp Animasyonu - Müzikli Romantik Versiyon</title>
+    <style>
+        body { margin: 0; background: #000; overflow: hidden; }
+        canvas { display: block; }
+        audio { display: none; } /* Gizli tut */
+    </style>
 </head>
 <body>
+    <canvas id="canvas"></canvas>
+    <audio id="bgMusic" loop autoplay>
+        <source src="https://files.catbox.moe/zewxvt.mp3" type="audio/mpeg">
+        Tarayıcınız bu ses dosyasını desteklemiyor.
+    </audio>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
 
-  <h1>🚧 Site Bakımda</h1>
-  <p>Sitemiz şu anda bakımda. En kısa sürede geri düzelticem bebeğim!</p>
+        // Müzik kontrolü (kullanıcı etkileşimi için)
+        const bgMusic = document.getElementById('bgMusic');
+        bgMusic.volume = 0.3; // Hafif ses, göz yormayan gibi
+        document.addEventListener('click', () => bgMusic.play().catch(e => console.log('Ses oynatımı engellendi:', e)), { once: true });
 
-  <div id="countdown">
-    <div class="time-box"><div id="days">00</div><span>Gün</span></div>
-    <div class="time-box"><div id="hours">00</div><span>Saat</span></div>
-    <div class="time-box"><div id="minutes">00</div><span>Dakika</span></div>
-    <div class="time-box"><div id="seconds">00</div><span>Saniye</span></div>
-  </div>
+        const numParticles = 1000;
+        const particles = [];
+        let mouse = { x: 0, y: 0, radius: 100 };
+        let disturbed = false;
+        let reformTimer = 0;
 
-  <footer>© 2025 - Tüm hakları saklıdır.</footer>
+        // Pastel renk paleti
+        const colors = ['#ff9a9e', '#fecfef', '#ffecd2', '#fcb69f', '#a8edea', '#fed6e3', '#f8b500'];
 
-  <script>
-    // 🌍 Global sayaç için sabit bitiş tarihi
-    // Örneğin şu an 5 Ekim 2025 ise, 3 gün sonrası 8 Ekim 2025 00:00
-    const targetTime = new Date("2025-10-08T00:00:00").getTime();
+        // Fotoğraflar: Senin 25 URL'in
+        const imagePaths = [
+            'https://i.ibb.co/JW8RVvkY/image3.jpg',
+            'https://i.ibb.co/Qj6vztzh/image2.jpg',
+            'https://i.ibb.co/whhD4kfy/image1.jpg',
+            'https://i.ibb.co/spcP7F7x/image0.jpg',
+            'https://i.ibb.co/205fsqYw/image27.jpg',
+            'https://i.ibb.co/PZC7CKyX/image26.jpg',
+            'https://i.ibb.co/W4t63Hrd/image25.jpg',
+            'https://i.ibb.co/mm2B9tb/image24.jpg',
+            'https://i.ibb.co/1tC5Lnmb/image23.jpg',
+            'https://i.ibb.co/N2CF1m3K/image22.jpg',
+            'https://i.ibb.co/CK572N3v/image21.jpg',
+            'https://i.ibb.co/ccr0zJ8P/image20.jpg',
+            'https://i.ibb.co/xKvcpLKY/image19.jpg',
+            'https://i.ibb.co/BVH3j2jZ/image18.jpg',
+            'https://i.ibb.co/nNgsgnyL/image17.jpg',
+            'https://i.ibb.co/tpZS1Kcb/image16.jpg',
+            'https://i.ibb.co/vxRsJTfh/image14.png',
+            'https://i.ibb.co/pCvL0vN/image13.jpg',
+            'https://i.ibb.co/N6CbmtqS/image12.jpg',
+            'https://i.ibb.co/BkqXz8G/image11.jpg',
+            'https://i.ibb.co/nspSGGYk/image10.jpg',
+            'https://i.ibb.co/h1CGmmYC/image7.jpg',
+            'https://i.ibb.co/YFyYQ2WT/image6.jpg',
+            'https://i.ibb.co/SgGJgp8/image5.jpg',
+            'https://i.ibb.co/Jw3pw8R4/image4.jpg'
+        ];
 
-    function updateCountdown() {
-      const now = new Date().getTime();
-      const distance = targetTime - now;
+        let images = [];
+        let currentImageIndex = 0;
+        let imageTimer = 0;
+        const imageDuration = 3000; // 3 saniye
+        let fadeAlpha = 1;
+        let fadingOut = false;
+        let fadingIn = false;
 
-      if (distance <= 0) {
-        document.getElementById("countdown").innerHTML = "Bakım tamamlandı!";
-        return;
-      }
+        // Geçici resim partikülleri
+        const imageParticles = [];
+        const numImageParticles = 200;
+        let imageBlendTimer = 0;
 
-      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        // Romantik mesaj
+        const message = "Bu kalp ne zaman dağılırsa, sevgim o an biter... Ama hadi dene, bozabilir misin? 💕";
+        const messageColor = '#ff9a9e'; // Pastel pembe
+        const messageAlpha = 0.8; // Hafif saydam
 
-      document.getElementById("days").innerText = String(days).padStart(2, '0');
-      document.getElementById("hours").innerText = String(hours).padStart(2, '0');
-      document.getElementById("minutes").innerText = String(minutes).padStart(2, '0');
-      document.getElementById("seconds").innerText = String(seconds).padStart(2, '0');
-    }
+        // Kalp denklemi
+        function getHeartPosition(angle, scale = 1) {
+            const x = 16 * Math.pow(Math.sin(angle), 3) * scale;
+            const y = -(13 * Math.cos(angle) - 5 * Math.cos(2 * angle) - 2 * Math.cos(3 * angle) - Math.cos(4 * angle)) * scale;
+            return { x, y };
+        }
 
-    updateCountdown();
-    setInterval(updateCountdown, 1000);
-  </script>
+        // Resim partiküllerini oluştur
+        function createImageParticles(img, centerX, centerY, width, height) {
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCanvas.width = width;
+            tempCanvas.height = height;
+            tempCtx.drawImage(img, 0, 0, width, height);
 
+            const imageData = tempCtx.getImageData(0, 0, width, height);
+            const data = imageData.data;
+
+            imageParticles.length = 0;
+            for (let i = 0; i < numImageParticles; i++) {
+                const randX = Math.random() * width;
+                const randY = Math.random() * height;
+                const index = (Math.floor(randY) * width + Math.floor(randX)) * 4;
+                const r = data[index];
+                const g = data[index + 1];
+                const b = data[index + 2];
+                const a = data[index + 3] / 255;
+
+                imageParticles.push({
+                    x: centerX + randX - width / 2,
+                    y: centerY + randY - height / 2,
+                    vx: (Math.random() - 0.5) * 3,
+                    vy: (Math.random() - 0.5) * 3,
+                    color: `rgba(${r}, ${g}, ${b}, ${a * 0.5})`,
+                    size: 1 + Math.random() * 2,
+                    life: 1.0
+                });
+            }
+            imageBlendTimer = 60;
+            console.log('Partikül karışması başladı!');
+        }
+
+        // Resimleri yükle
+        function loadImages() {
+            imagePaths.forEach((path, index) => {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.src = path;
+                img.onload = () => {
+                    images[index] = img;
+                    console.log(`Resim ${index + 1} yüklendi: ${path}`);
+                    if (images.length === imagePaths.length) {
+                        console.log('Tüm resimler yüklendi! Döngü başlıyor.');
+                    }
+                };
+                img.onerror = () => {
+                    console.error(`Resim ${index + 1} yüklenemedi: ${path}`);
+                };
+            });
+        }
+
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                const angle = Math.random() * Math.PI * 2;
+                const radius = 40 + Math.random() * 30;
+                const heartPos = getHeartPosition(angle, radius);
+                this.targetX = canvas.width / 2 + heartPos.x;
+                this.targetY = canvas.height / 2 + heartPos.y;
+                this.x = this.targetX + (Math.random() - 0.5) * 5;
+                this.y = this.targetY + (Math.random() - 0.5) * 5;
+                this.vx = (Math.random() - 0.5) * 0.3;
+                this.vy = (Math.random() - 0.5) * 0.3;
+                this.angle = angle;
+                this.speed = 0.002 + Math.random() * 0.003;
+                this.colorIndex = Math.floor(Math.random() * colors.length);
+                this.size = 0.8 + Math.random() * 1.5;
+            }
+
+            update() {
+                this.angle += this.speed;
+                const heartPos = getHeartPosition(this.angle, 40 + Math.sin(Date.now() * 0.0005 + this.angle * 5) * 10);
+                this.targetX = canvas.width / 2 + heartPos.x;
+                this.targetY = canvas.height / 2 + heartPos.y;
+
+                if (Math.random() < 0.0005) {
+                    this.vx += (Math.random() - 0.5) * 1.5;
+                    this.vy += (Math.random() - 0.5) * 1.5;
+                }
+
+                const dx = this.x - mouse.x;
+                const dy = this.y - mouse.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < mouse.radius && !disturbed) {
+                    disturbed = true;
+                    reformTimer = 180;
+                    this.vx += (dx / dist) * 4;
+                    this.vy += (dy / dist) * 4;
+                }
+
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vx *= 0.97;
+                this.vy *= 0.97;
+
+                if (disturbed && reformTimer > 0) {
+                    const pullDx = this.targetX - this.x;
+                    const pullDy = this.targetY - this.y;
+                    const pullDist = Math.sqrt(pullDx * pullDx + pullDy * pullDy);
+                    if (pullDist > 1) {
+                        this.vx += (pullDx / pullDist) * 0.02;
+                        this.vy += (pullDy / pullDist) * 0.02;
+                    }
+                    reformTimer--;
+                    if (reformTimer <= 0) {
+                        disturbed = false;
+                        this.x = this.targetX;
+                        this.y = this.targetY;
+                    }
+                } else {
+                    this.x += (this.targetX - this.x) * 0.008;
+                    this.y += (this.targetY - this.y) * 0.008;
+                }
+
+                this.colorIndex = Math.floor((Date.now() * 0.0005 + this.angle * 10) % colors.length);
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = colors[this.colorIndex];
+                ctx.fill();
+            }
+        }
+
+        // Parçacıkları oluştur
+        for (let i = 0; i < numParticles; i++) {
+            particles.push(new Particle());
+        }
+
+        // Fare hareketi
+        canvas.addEventListener('mousemove', (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+        });
+
+        // Animasyon
+        function animate() {
+            // Tam siyah arka plan
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Image partiküllerini güncelle ve çiz
+            if (imageParticles.length > 0) {
+                for (let i = imageParticles.length - 1; i >= 0; i--) {
+                    const p = imageParticles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vx *= 0.98;
+                    p.vy *= 0.98;
+                    p.life -= 0.01;
+                    if (p.life <= 0) {
+                        imageParticles.splice(i, 1);
+                        continue;
+                    }
+                    ctx.save();
+                    ctx.globalAlpha = p.life * 0.4;
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                }
+                if (imageParticles.length === 0) {
+                    imageBlendTimer = 0;
+                    console.log('Partikül karışması bitti!');
+                }
+            }
+
+            // Fotoğrafı çiz
+            if (images.length > 0) {
+                const img = images[currentImageIndex];
+                if (img) {
+                    const heartSize = 120;
+                    const heartWidth = heartSize;
+                    const heartHeight = heartSize * 1.2;
+                    const centerX = canvas.width / 2 - heartWidth / 2;
+                    const centerY = canvas.height / 2 - heartHeight / 2;
+
+                    imageTimer++;
+                    if (imageTimer > imageDuration && !fadingOut) {
+                        fadingOut = true;
+                        fadeAlpha -= 0.04;
+                        if (fadeAlpha <= 0) {
+                            createImageParticles(img, canvas.width / 2, canvas.height / 2, heartWidth, heartHeight);
+                            currentImageIndex = (currentImageIndex + 1) % images.length;
+                            console.log(`Değişim: ${currentImageIndex} resme geçildi!`);
+                            fadeAlpha = 0;
+                            fadingOut = false;
+                            fadingIn = true;
+                            imageTimer = 0;
+                        }
+                    } else if (fadingOut) {
+                        fadeAlpha -= 0.04;
+                        if (fadeAlpha <= 0) {
+                            fadingOut = false;
+                            fadingIn = true;
+                        }
+                    } else if (fadingIn && fadeAlpha < 1) {
+                        fadeAlpha += 0.04;
+                        if (fadeAlpha >= 1) {
+                            fadingIn = false;
+                        }
+                    }
+
+                    ctx.save();
+                    ctx.globalAlpha = fadeAlpha;
+                    ctx.drawImage(img, centerX, centerY, heartWidth, heartHeight);
+                    ctx.restore();
+                } else {
+                    console.log(`Resim ${currentImageIndex + 1} yüklenmemiş, bekleniyor...`);
+                }
+            } else {
+                console.log('Henüz resim yüklenmedi, bekle...');
+            }
+
+            // Romantik mesajı çiz
+            if (images.length > 0 && fadeAlpha > 0) {
+                const messageY = canvas.height / 2 + 80;
+                ctx.save();
+                ctx.globalAlpha = messageAlpha;
+                ctx.fillStyle = messageColor;
+                ctx.font = 'italic 18px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'top';
+                ctx.shadowColor = messageColor;
+                ctx.shadowBlur = 5;
+                ctx.fillText(message, canvas.width / 2, messageY);
+                ctx.restore();
+            }
+
+            // Kum tanelerini en son çiz
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        // Başlat
+        loadImages();
+        animate();
+
+        // Yeniden boyutlandırma
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            particles.forEach(p => {
+                const heartPos = getHeartPosition(p.angle, 40);
+                p.targetX = canvas.width / 2 + heartPos.x;
+                p.targetY = canvas.height / 2 + heartPos.y;
+            });
+        });
+    </script>
 </body>
 </html>
