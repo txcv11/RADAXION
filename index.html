@@ -23,7 +23,7 @@
 
         // Müzik kontrolü (kullanıcı etkileşimi için)
         const bgMusic = document.getElementById('bgMusic');
-        bgMusic.volume = 0.3; // Hafif ses, göz yormayan gibi
+        bgMusic.volume = 0.7; // Hafif ses, göz yormayan gibi
         document.addEventListener('click', () => bgMusic.play().catch(e => console.log('Ses oynatımı engellendi:', e)), { once: true });
 
         const numParticles = 1000;
