@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Sevgilim seni çok seviyorum...</title>
+    <title>Kum Kalp Animasyonu - Müzikli Romantik Versiyon</title>
     <style>
         body { 
             margin: 0; 
@@ -71,10 +71,11 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            opacity: 0.15; /* Silinik olması için düşük opaklık */
-            filter: blur(8px); /* Daha yumuşak durması için blur */
+            /* Dithered efektli resimler zaten silinik durduğu için opacity ve blur'u azalttım */
+            opacity: 0.1; /* Çok hafif, dither dokusu görünsün diye */
+            filter: blur(2px); /* Dither dokusunu tamamen yok etmemek için blur'u azalttım */
             z-index: 0;
-            transition: src 1.5s ease-in-out, opacity 1.5s ease-in-out;
+            transition: src 1.5s ease-in-out;
         }
         canvas { 
             display: block; 
@@ -230,14 +231,15 @@
 
             const numParticles = 1000;
             const particles = [];
-            let mouse = { x: 0, y: 0, radius: 100 };
+            let mouse = { x: 0, y: 0, radius: 150 }; // Fare etki alanı büyüdü
             let disturbed = false;
             let reformTimer = 0;
 
             const colors = ['#ff9a9e', '#fecfef', '#ffecd2', '#fcb69f', '#a8edea', '#fed6e3', '#f8b500'];
 
+            // === DİKKAT: BURAYA ADIM 1'DE HAZIRLADIĞIN YENİ URL'LERİ YAZMALISIN ===
             const imagePaths = [
-                'https://i.ibb.co/JW8RVvkY/image3.jpg',
+                'https://i.ibb.co/JW8RVvkY/image3.jpg', // Örnek: burayı dithered resim URL'si ile değiştir
                 'https://i.ibb.co/Qj6vztzh/image2.jpg',
                 'https://i.ibb.co/whhD4kfy/image1.jpg',
                 'https://i.ibb.co/spcP7F7x/image0.jpg',
@@ -267,17 +269,17 @@
             let images = [];
             let currentImageIndex = 0;
             let imageTimer = 0;
-            const imageDuration = 3000; 
+            const imageDuration = 3500; // Biraz daha uzun durması daha iyi
             let fadeAlpha = 1;
             let fadingOut = false;
             let fadingIn = false;
 
             const imageParticles = [];
-            const numImageParticles = 200;
+            const numImageParticles = 400; // Patlama daha yoğun olsun
 
             const message = "Bu kalp ne zaman bozulursa, sevgim o zaman biticek bebeğim... 💕";
             const messageColor = '#ff9a9e';
-            const messageAlpha = 0.8;
+            const messageAlpha = 0.9;
 
             function getHeartPosition(angle, scale = 1) {
                 const x = 16 * Math.pow(Math.sin(angle), 3) * scale;
@@ -308,23 +310,33 @@
                     imageParticles.push({
                         x: centerX + randX - width / 2,
                         y: centerY + randY - height / 2,
-                        vx: (Math.random() - 0.5) * 3,
-                        vy: (Math.random() - 0.5) * 3,
-                        color: `rgba(${r}, ${g}, ${b}, ${a * 0.5})`,
-                        size: 1 + Math.random() * 2,
-                        life: 1.0
+                        vx: (Math.random() - 0.5) * 5, // Daha hızlı patlama
+                        vy: (Math.random() - 0.5) * 5,
+                        color: `rgba(${r}, ${g}, ${b}, ${a * 0.6})`,
+                        size: 1 + Math.random() * 3, // Daha büyük parçacıklar
+                        life: 1.0 + Math.random() * 0.5 // Daha uzun ömürlü patlama
                     });
                 }
             }
 
             function loadImages() {
+                let loadedCount = 0;
                 imagePaths.forEach((path, index) => {
                     const img = new Image();
                     img.crossOrigin = 'anonymous';
                     img.src = path;
                     img.onload = () => {
                         images[index] = img;
+                        loadedCount++;
                         if (index === 0) bgFullImage.src = path; // İlk resmi arka plana koy
+                        if (loadedCount === imagePaths.length) {
+                            animate(); // Tüm resimler yüklenince animasyonu başlat
+                        }
+                    };
+                    img.onerror = () => {
+                        console.error("Resim yüklenemedi: " + path);
+                        loadedCount++; // Hata olsa bile sayacı artır ki animasyon başlasın
+                        if (loadedCount === imagePaths.length) animate();
                     };
                 });
             }
@@ -336,23 +348,23 @@
 
                 reset() {
                     const angle = Math.random() * Math.PI * 2;
-                    const radius = 40 + Math.random() * 30;
+                    const radius = 60 + Math.random() * 40; // Daha geniş kum kalbi
                     const heartPos = getHeartPosition(angle, radius);
                     this.targetX = canvas.width / 2 + heartPos.x;
                     this.targetY = canvas.height / 2 + heartPos.y;
-                    this.x = this.targetX + (Math.random() - 0.5) * 5;
-                    this.y = this.targetY + (Math.random() - 0.5) * 5;
-                    this.vx = (Math.random() - 0.5) * 0.3;
-                    this.vy = (Math.random() - 0.5) * 0.3;
+                    this.x = this.targetX + (Math.random() - 0.5) * 10;
+                    this.y = this.targetY + (Math.random() - 0.5) * 10;
+                    this.vx = (Math.random() - 0.5) * 0.5;
+                    this.vy = (Math.random() - 0.5) * 0.5;
                     this.angle = angle;
-                    this.speed = 0.002 + Math.random() * 0.003;
+                    this.speed = 0.0015 + Math.random() * 0.0025; // Biraz daha yavaş hareket
                     this.colorIndex = Math.floor(Math.random() * colors.length);
-                    this.size = 0.8 + Math.random() * 1.5;
+                    this.size = 1.0 + Math.random() * 2.0; // Daha büyük kum taneleri
                 }
 
                 update() {
                     this.angle += this.speed;
-                    const heartPos = getHeartPosition(this.angle, 40 + Math.sin(Date.now() * 0.0005 + this.angle * 5) * 10);
+                    const heartPos = getHeartPosition(this.angle, 60 + Math.sin(Date.now() * 0.0004 + this.angle * 4) * 15);
                     this.targetX = canvas.width / 2 + heartPos.x;
                     this.targetY = canvas.height / 2 + heartPos.y;
 
@@ -361,32 +373,32 @@
                     const dist = Math.sqrt(dx * dx + dy * dy);
                     if (dist < mouse.radius && !disturbed) {
                         disturbed = true;
-                        reformTimer = 180;
-                        this.vx += (dx / dist) * 4;
-                        this.vy += (dy / dist) * 4;
+                        reformTimer = 200; // Daha uzun süre dağınık kalsın
+                        this.vx += (dx / dist) * 5;
+                        this.vy += (dy / dist) * 5;
                     }
 
                     this.x += this.vx;
                     this.y += this.vy;
-                    this.vx *= 0.97;
-                    this.vy *= 0.97;
+                    this.vx *= 0.98; // Daha az yavaşlama
+                    this.vy *= 0.98;
 
                     if (disturbed && reformTimer > 0) {
                         const pullDx = this.targetX - this.x;
                         const pullDy = this.targetY - this.y;
                         const pullDist = Math.sqrt(pullDx * pullDx + pullDy * pullDy);
                         if (pullDist > 1) {
-                            this.vx += (pullDx / pullDist) * 0.02;
-                            this.vy += (pullDy / pullDist) * 0.02;
+                            this.vx += (pullDx / pullDist) * 0.025;
+                            this.vy += (pullDy / pullDist) * 0.025;
                         }
                         reformTimer--;
                         if (reformTimer <= 0) disturbed = false;
                     } else {
-                        this.x += (this.targetX - this.x) * 0.008;
-                        this.y += (this.targetY - this.y) * 0.008;
+                        this.x += (this.targetX - this.x) * 0.01; // Daha yavaş toparlanma
+                        this.y += (this.targetY - this.y) * 0.01;
                     }
 
-                    this.colorIndex = Math.floor((Date.now() * 0.0005 + this.angle * 10) % colors.length);
+                    this.colorIndex = Math.floor((Date.now() * 0.0004 + this.angle * 8) % colors.length);
                 }
 
                 draw() {
@@ -414,11 +426,11 @@
                     for (let i = imageParticles.length - 1; i >= 0; i--) {
                         const p = imageParticles[i];
                         p.x += p.vx; p.y += p.vy;
-                        p.vx *= 0.98; p.vy *= 0.98;
-                        p.life -= 0.01;
+                        p.vx *= 0.99; p.vy *= 0.99;
+                        p.life -= 0.008; // Daha yavaş kaybolma
                         if (p.life <= 0) { imageParticles.splice(i, 1); continue; }
                         ctx.save();
-                        ctx.globalAlpha = p.life * 0.4;
+                        ctx.globalAlpha = p.life * 0.5;
                         ctx.fillStyle = p.color;
                         ctx.beginPath();
                         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
@@ -430,29 +442,28 @@
                 if (images.length > 0) {
                     const img = images[currentImageIndex];
                     if (img) {
-                        const heartSize = 120;
+                        const heartSize = 300; // Çok daha büyük resim (300px)
                         const heartWidth = heartSize;
                         const heartHeight = heartSize * 1.2;
                         const centerX = canvas.width / 2 - heartWidth / 2;
-                        const centerY = canvas.height / 2 - heartHeight / 2;
+                        const centerY = canvas.height / 2 - heartHeight / 2 - 30; // Biraz yukarı aldık
 
                         imageTimer++;
                         if (imageTimer > imageDuration && !fadingOut) {
                             fadingOut = true;
                         } else if (fadingOut) {
-                            fadeAlpha -= 0.04;
+                            fadeAlpha -= 0.03; // Daha yavaş fade out
                             if (fadeAlpha <= 0) {
-                                createImageParticles(img, canvas.width / 2, canvas.height / 2, heartWidth, heartHeight);
+                                createImageParticles(img, canvas.width / 2, canvas.height / 2 - 30, heartWidth, heartHeight);
                                 currentImageIndex = (currentImageIndex + 1) % images.length;
-                                // Arka plan büyük resmi güncelle
-                                bgFullImage.src = images[currentImageIndex].src;
+                                bgFullImage.src = images[currentImageIndex].src; // Arka planı güncelle
                                 fadeAlpha = 0;
                                 fadingOut = false;
                                 fadingIn = true;
                                 imageTimer = 0;
                             }
                         } else if (fadingIn && fadeAlpha < 1) {
-                            fadeAlpha += 0.04;
+                            fadeAlpha += 0.03; // Daha yavaş fade in
                             if (fadeAlpha >= 1) fadingIn = false;
                         }
 
@@ -464,11 +475,11 @@
                 }
 
                 if (images.length > 0 && fadeAlpha > 0) {
-                    const messageY = canvas.height / 2 + 80;
+                    const messageY = canvas.height / 2 + 180; // Resim büyüdüğü için yazıyı aşağı aldık
                     ctx.save();
-                    ctx.globalAlpha = messageAlpha;
+                    ctx.globalAlpha = messageAlpha * fadeAlpha; // Resimle birlikte solsun
                     ctx.fillStyle = messageColor;
-                    ctx.font = 'italic 18px Arial';
+                    ctx.font = 'italic 20px Arial'; // Biraz daha büyük yazı
                     ctx.textAlign = 'center';
                     ctx.fillText(message, canvas.width / 2, messageY);
                     ctx.restore();
@@ -482,8 +493,7 @@
                 requestAnimationFrame(animate);
             }
 
-            loadImages();
-            animate();
+            loadImages(); // Resimleri yüklemeyi başlat (animasyon otomatik başlayacak)
 
             window.addEventListener('resize', () => {
                 canvas.width = window.innerWidth;
