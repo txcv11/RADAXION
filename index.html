@@ -9,27 +9,27 @@ body {
   margin: 0;
   background: #000;
   overflow: hidden;
-  font-family: Arial, sans-serif;
 }
 
-/* Arka plan */
+/* ARKA PLAN */
 #bg {
   position: fixed;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.15;
-  filter: blur(6px);
+  opacity: 0.2;
+  filter: blur(8px);
+  transition: opacity 1s;
 }
 
-/* Canvas */
+/* CANVAS */
 canvas {
   position: absolute;
   top: 0;
   left: 0;
 }
 
-/* Alt yazı */
+/* YAZI */
 #text {
   position: absolute;
   bottom: 40px;
@@ -37,7 +37,6 @@ canvas {
   text-align: center;
   color: #ff9a9e;
   font-size: 18px;
-  letter-spacing: 1px;
   opacity: 0.8;
 }
 </style>
@@ -46,77 +45,121 @@ canvas {
 <body>
 
 <img id="bg">
-
 <canvas id="canvas"></canvas>
-
 <div id="text">sen benim en güzel tesadüfümsün ❤️</div>
 
-<audio autoplay loop>
+<audio id="music" loop>
   <source src="https://files.catbox.moe/wxukv3.mp3" type="audio/mpeg">
 </audio>
 
 <script>
+/* ===== MÜZİK ===== */
+const music = document.getElementById("music");
+
+document.addEventListener("click", () => {
+  music.play();
+}, { once: true });
+
+
+/* ===== CANVAS ===== */
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
-const bg = document.getElementById("bg");
 
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-/* RESİMLER */
-const images = [
+
+/* ===== RESİMLER (GARANTİLİ YÜKLEME) ===== */
+const imageURLs = [
 "https://i.ibb.co/JW8RVvkY/image3.jpg",
 "https://i.ibb.co/Qj6vztzh/image2.jpg",
 "https://i.ibb.co/whhD4kfy/image1.jpg",
 "https://i.ibb.co/spcP7F7x/image0.jpg"
 ];
 
-let imgIndex = 0;
-setInterval(()=>{
-  imgIndex = (imgIndex + 1) % images.length;
-  bg.src = images[imgIndex];
-},4000);
+let images = [];
+let loaded = 0;
+let current = 0;
 
-bg.src = images[0];
+const bg = document.getElementById("bg");
 
-/* KALP */
-function heart(t, s=10){ // KÜÇÜLTÜLDÜ
+imageURLs.forEach((src, i) => {
+  const img = new Image();
+  img.src = src;
+
+  img.onload = () => {
+    images[i] = img;
+    loaded++;
+
+    if (loaded === imageURLs.length) {
+      bg.src = images[0].src;
+    }
+  };
+
+  img.onerror = () => {
+    console.log("yüklenemedi:", src);
+  };
+});
+
+/* RESİM GEÇİŞ */
+setInterval(() => {
+  if (images.length === 0) return;
+
+  current = (current + 1) % images.length;
+
+  bg.style.opacity = 0;
+
+  setTimeout(() => {
+    bg.src = images[current].src;
+    bg.style.opacity = 0.2;
+  }, 500);
+
+}, 4000);
+
+
+/* ===== KALP ===== */
+function heart(t, s = 8) { // KÜÇÜK
   return {
-    x: 16 * Math.pow(Math.sin(t),3) * s,
-    y: -(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t)) * s
+    x: 16 * Math.pow(Math.sin(t), 3) * s,
+    y: -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t)) * s
   };
 }
 
-class Particle{
-  constructor(){
-    this.t = Math.random()*Math.PI*2;
-    this.speed = 0.002 + Math.random()*0.002;
-    this.size = Math.random()*2 + 0.5;
+class Particle {
+  constructor() {
+    this.t = Math.random() * Math.PI * 2;
+    this.speed = 0.002 + Math.random() * 0.002;
+    this.size = Math.random() * 2 + 0.5;
   }
-  update(){
+
+  update() {
     this.t += this.speed;
-    const p = heart(this.t, 8); // BURASI KALP BOYUTU
-    this.x = canvas.width/2 + p.x;
-    this.y = canvas.height/2 + p.y;
+    const p = heart(this.t, 8);
+
+    this.x = canvas.width / 2 + p.x;
+    this.y = canvas.height / 2 + p.y;
   }
-  draw(){
+
+  draw() {
     ctx.beginPath();
-    ctx.arc(this.x,this.y,this.size,0,Math.PI*2);
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
     ctx.fillStyle = "#ff9a9e";
     ctx.fill();
   }
 }
 
 const particles = [];
-for(let i=0;i<600;i++){
+for (let i = 0; i < 700; i++) {
   particles.push(new Particle());
 }
 
-function animate(){
-  ctx.fillStyle="rgba(0,0,0,0.2)";
-  ctx.fillRect(0,0,canvas.width,canvas.height);
 
-  particles.forEach(p=>{
+/* ===== ANİMASYON ===== */
+function animate() {
+  ctx.fillStyle = "rgba(0,0,0,0.2)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  particles.forEach(p => {
     p.update();
     p.draw();
   });
@@ -126,7 +169,9 @@ function animate(){
 
 animate();
 
-window.addEventListener("resize",()=>{
+
+/* ===== RESIZE ===== */
+window.addEventListener("resize", () => {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 });
