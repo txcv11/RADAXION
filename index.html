@@ -20,6 +20,8 @@
             color: #ff9a9e;
             background: #000;
             text-align: center;
+            position: relative;
+            z-index: 10;
         }
         #passwordScreen h1 {
             font-size: 24px;
@@ -61,18 +63,32 @@
             position: relative;
             overflow: hidden;
         }
+        /* Arka Plan Büyük Resim Katmanı */
+        #bgFullImage {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.15; /* Silinik olması için düşük opaklık */
+            filter: blur(8px); /* Daha yumuşak durması için blur */
+            z-index: 0;
+            transition: src 1.5s ease-in-out, opacity 1.5s ease-in-out;
+        }
         canvas { 
             display: block; 
             position: absolute;
             top: 0;
             left: 0;
+            z-index: 2; /* Kum taneleri ve kalp önde */
         }
-        audio { display: none; } /* Gizli tut */
+        audio { display: none; } 
         #section2 {
             min-height: 100vh;
             padding: 50px;
             box-sizing: border-box;
-            color: #ff9a9e; /* Pastel pembe varsayılan */
+            color: #ff9a9e; 
             background: #000;
             display: flex;
             align-items: flex-start;
@@ -81,6 +97,8 @@
             line-height: 1.6;
             font-size: 18px;
             overflow-y: auto;
+            position: relative;
+            z-index: 5;
         }
         #section2 .content {
             max-width: 800px;
@@ -112,7 +130,6 @@
             from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        /* Scroll snapping for page-like feel */
         html {
             scroll-snap-type: y mandatory;
         }
@@ -133,9 +150,10 @@
     </div>
     <div id="mainContent">
         <section id="section1">
+            <img id="bgFullImage" src="" alt="arka plan">
             <canvas id="canvas"></canvas>
             <audio id="bgMusic" loop>
-                <source src="https://files.catbox.moe/zewxvt.mp3" type="audio/mpeg">
+                <source src="https://files.catbox.moe/wxukv3.mp3" type="audio/mpeg">
                 Tarayıcınız bu ses dosyasını desteklemiyor.
             </audio>
         </section>
@@ -160,6 +178,7 @@
         const passwordInput = document.getElementById('passwordInput');
         const passwordButton = document.getElementById('passwordButton');
         const messageDiv = document.getElementById('message');
+        const bgFullImage = document.getElementById('bgFullImage');
         const correctPassword = 'bebeğim';
         let attempts = 0;
 
@@ -178,7 +197,6 @@
                 const bgMusic = document.getElementById('bgMusic');
                 bgMusic.volume = 0.7;
                 bgMusic.play().catch(e => console.log('Ses oynatımı engellendi:', e));
-                // Ana animasyonu başlat
                 initMain();
             } else {
                 attempts++;
@@ -216,10 +234,8 @@
             let disturbed = false;
             let reformTimer = 0;
 
-            // Pastel renk paleti
             const colors = ['#ff9a9e', '#fecfef', '#ffecd2', '#fcb69f', '#a8edea', '#fed6e3', '#f8b500'];
 
-            // Fotoğraflar: Senin 25 URL'in
             const imagePaths = [
                 'https://i.ibb.co/JW8RVvkY/image3.jpg',
                 'https://i.ibb.co/Qj6vztzh/image2.jpg',
@@ -251,29 +267,24 @@
             let images = [];
             let currentImageIndex = 0;
             let imageTimer = 0;
-            const imageDuration = 3000; // 3 saniye
+            const imageDuration = 3000; 
             let fadeAlpha = 1;
             let fadingOut = false;
             let fadingIn = false;
 
-            // Geçici resim partikülleri
             const imageParticles = [];
             const numImageParticles = 200;
-            let imageBlendTimer = 0;
 
-            // Romantik mesaj
             const message = "Bu kalp ne zaman bozulursa, sevgim o zaman biticek bebeğim... 💕";
-            const messageColor = '#ff9a9e'; // Pastel pembe
-            const messageAlpha = 0.8; // Hafif saydam
+            const messageColor = '#ff9a9e';
+            const messageAlpha = 0.8;
 
-            // Kalp denklemi
             function getHeartPosition(angle, scale = 1) {
                 const x = 16 * Math.pow(Math.sin(angle), 3) * scale;
                 const y = -(13 * Math.cos(angle) - 5 * Math.cos(2 * angle) - 2 * Math.cos(3 * angle) - Math.cos(4 * angle)) * scale;
                 return { x, y };
             }
 
-            // Resim partiküllerini oluştur
             function createImageParticles(img, centerX, centerY, width, height) {
                 const tempCanvas = document.createElement('canvas');
                 const tempCtx = tempCanvas.getContext('2d');
@@ -304,11 +315,8 @@
                         life: 1.0
                     });
                 }
-                imageBlendTimer = 60;
-                console.log('Partikül karışması başladı!');
             }
 
-            // Resimleri yükle
             function loadImages() {
                 imagePaths.forEach((path, index) => {
                     const img = new Image();
@@ -316,13 +324,7 @@
                     img.src = path;
                     img.onload = () => {
                         images[index] = img;
-                        console.log(`Resim ${index + 1} yüklendi: ${path}`);
-                        if (images.length === imagePaths.length) {
-                            console.log('Tüm resimler yüklendi! Döngü başlıyor.');
-                        }
-                    };
-                    img.onerror = () => {
-                        console.error(`Resim ${index + 1} yüklenemedi: ${path}`);
+                        if (index === 0) bgFullImage.src = path; // İlk resmi arka plana koy
                     };
                 });
             }
@@ -354,11 +356,6 @@
                     this.targetX = canvas.width / 2 + heartPos.x;
                     this.targetY = canvas.height / 2 + heartPos.y;
 
-                    if (Math.random() < 0.0005) {
-                        this.vx += (Math.random() - 0.5) * 1.5;
-                        this.vy += (Math.random() - 0.5) * 1.5;
-                    }
-
                     const dx = this.x - mouse.x;
                     const dy = this.y - mouse.y;
                     const dist = Math.sqrt(dx * dx + dy * dy);
@@ -383,11 +380,7 @@
                             this.vy += (pullDy / pullDist) * 0.02;
                         }
                         reformTimer--;
-                        if (reformTimer <= 0) {
-                            disturbed = false;
-                            this.x = this.targetX;
-                            this.y = this.targetY;
-                        }
+                        if (reformTimer <= 0) disturbed = false;
                     } else {
                         this.x += (this.targetX - this.x) * 0.008;
                         this.y += (this.targetY - this.y) * 0.008;
@@ -404,36 +397,26 @@
                 }
             }
 
-            // Parçacıkları oluştur
             for (let i = 0; i < numParticles; i++) {
                 particles.push(new Particle());
             }
 
-            // Fare hareketi
             canvas.addEventListener('mousemove', (e) => {
                 mouse.x = e.clientX;
                 mouse.y = e.clientY;
             });
 
-            // Animasyon
             function animate() {
-                // Tam siyah arka plan
                 ctx.fillStyle = '#000000';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                // Image partiküllerini güncelle ve çiz
                 if (imageParticles.length > 0) {
                     for (let i = imageParticles.length - 1; i >= 0; i--) {
                         const p = imageParticles[i];
-                        p.x += p.vx;
-                        p.y += p.vy;
-                        p.vx *= 0.98;
-                        p.vy *= 0.98;
+                        p.x += p.vx; p.y += p.vy;
+                        p.vx *= 0.98; p.vy *= 0.98;
                         p.life -= 0.01;
-                        if (p.life <= 0) {
-                            imageParticles.splice(i, 1);
-                            continue;
-                        }
+                        if (p.life <= 0) { imageParticles.splice(i, 1); continue; }
                         ctx.save();
                         ctx.globalAlpha = p.life * 0.4;
                         ctx.fillStyle = p.color;
@@ -442,13 +425,8 @@
                         ctx.fill();
                         ctx.restore();
                     }
-                    if (imageParticles.length === 0) {
-                        imageBlendTimer = 0;
-                        console.log('Partikül karışması bitti!');
-                    }
                 }
 
-                // Fotoğrafı çiz
                 if (images.length > 0) {
                     const img = images[currentImageIndex];
                     if (img) {
@@ -461,41 +439,30 @@
                         imageTimer++;
                         if (imageTimer > imageDuration && !fadingOut) {
                             fadingOut = true;
+                        } else if (fadingOut) {
                             fadeAlpha -= 0.04;
                             if (fadeAlpha <= 0) {
                                 createImageParticles(img, canvas.width / 2, canvas.height / 2, heartWidth, heartHeight);
                                 currentImageIndex = (currentImageIndex + 1) % images.length;
-                                console.log(`Değişim: ${currentImageIndex} resme geçildi!`);
+                                // Arka plan büyük resmi güncelle
+                                bgFullImage.src = images[currentImageIndex].src;
                                 fadeAlpha = 0;
                                 fadingOut = false;
                                 fadingIn = true;
                                 imageTimer = 0;
                             }
-                        } else if (fadingOut) {
-                            fadeAlpha -= 0.04;
-                            if (fadeAlpha <= 0) {
-                                fadingOut = false;
-                                fadingIn = true;
-                            }
                         } else if (fadingIn && fadeAlpha < 1) {
                             fadeAlpha += 0.04;
-                            if (fadeAlpha >= 1) {
-                                fadingIn = false;
-                            }
+                            if (fadeAlpha >= 1) fadingIn = false;
                         }
 
                         ctx.save();
                         ctx.globalAlpha = fadeAlpha;
                         ctx.drawImage(img, centerX, centerY, heartWidth, heartHeight);
                         ctx.restore();
-                    } else {
-                        console.log(`Resim ${currentImageIndex + 1} yüklenmemiş, bekleniyor...`);
                     }
-                } else {
-                    console.log('Henüz resim yüklenmedi, bekle...');
                 }
 
-                // Romantik mesajı çiz
                 if (images.length > 0 && fadeAlpha > 0) {
                     const messageY = canvas.height / 2 + 80;
                     ctx.save();
@@ -503,14 +470,10 @@
                     ctx.fillStyle = messageColor;
                     ctx.font = 'italic 18px Arial';
                     ctx.textAlign = 'center';
-                    ctx.textBaseline = 'top';
-                    ctx.shadowColor = messageColor;
-                    ctx.shadowBlur = 5;
                     ctx.fillText(message, canvas.width / 2, messageY);
                     ctx.restore();
                 }
 
-                // Kum tanelerini en son çiz
                 particles.forEach(p => {
                     p.update();
                     p.draw();
@@ -519,23 +482,14 @@
                 requestAnimationFrame(animate);
             }
 
-            // Başlat
             loadImages();
             animate();
 
-            // Yeniden boyutlandırma
             window.addEventListener('resize', () => {
                 canvas.width = window.innerWidth;
                 canvas.height = window.innerHeight;
-                particles.forEach(p => {
-                    const heartPos = getHeartPosition(p.angle, 40);
-                    p.targetX = canvas.width / 2 + heartPos.x;
-                    p.targetY = canvas.height / 2 + heartPos.y;
-                });
             });
         }
-
-        // Şifre ekranı odakla
         passwordInput.focus();
     </script>
 </body>
