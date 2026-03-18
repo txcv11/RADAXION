@@ -1,210 +1,134 @@
 <!DOCTYPE html>
-
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>Kum Kalp Animasyonu - Gelişmiş</title>
+<title>❤️</title>
 
 <style>
-body { 
-    margin: 0; 
-    background: #000; 
-    overflow: hidden;
+body {
+  margin: 0;
+  background: #000;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
 }
 
-canvas { 
-    display: block;
+/* Arka plan */
+#bg {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.15;
+  filter: blur(6px);
 }
 
-#bgFullImage {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    opacity: 0.1;
-    transition: opacity 2s ease-in-out;
+/* Canvas */
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* Alt yazı */
+#text {
+  position: absolute;
+  bottom: 40px;
+  width: 100%;
+  text-align: center;
+  color: #ff9a9e;
+  font-size: 18px;
+  letter-spacing: 1px;
+  opacity: 0.8;
 }
 </style>
-
 </head>
 
 <body>
 
-<img id="bgFullImage" src="">
+<img id="bg">
+
 <canvas id="canvas"></canvas>
 
+<div id="text">sen benim en güzel tesadüfümsün ❤️</div>
+
+<audio autoplay loop>
+  <source src="https://files.catbox.moe/wxukv3.mp3" type="audio/mpeg">
+</audio>
+
 <script>
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
-const bgFullImage = document.getElementById('bgFullImage');
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const bg = document.getElementById("bg");
 
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-const imagePaths = [
-'https://i.ibb.co/JW8RVvkY/image3.jpg',
-'https://i.ibb.co/Qj6vztzh/image2.jpg',
-'https://i.ibb.co/whhD4kfy/image1.jpg'
+/* RESİMLER */
+const images = [
+"https://i.ibb.co/JW8RVvkY/image3.jpg",
+"https://i.ibb.co/Qj6vztzh/image2.jpg",
+"https://i.ibb.co/whhD4kfy/image1.jpg",
+"https://i.ibb.co/spcP7F7x/image0.jpg"
 ];
 
-let images = [];
-let currentImageIndex = 0;
-let fadeAlpha = 1;
-let fadingOut = false;
-let fadingIn = false;
-let timer = 0;
+let imgIndex = 0;
+setInterval(()=>{
+  imgIndex = (imgIndex + 1) % images.length;
+  bg.src = images[imgIndex];
+},4000);
+
+bg.src = images[0];
+
+/* KALP */
+function heart(t, s=10){ // KÜÇÜLTÜLDÜ
+  return {
+    x: 16 * Math.pow(Math.sin(t),3) * s,
+    y: -(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t)) * s
+  };
+}
+
+class Particle{
+  constructor(){
+    this.t = Math.random()*Math.PI*2;
+    this.speed = 0.002 + Math.random()*0.002;
+    this.size = Math.random()*2 + 0.5;
+  }
+  update(){
+    this.t += this.speed;
+    const p = heart(this.t, 8); // BURASI KALP BOYUTU
+    this.x = canvas.width/2 + p.x;
+    this.y = canvas.height/2 + p.y;
+  }
+  draw(){
+    ctx.beginPath();
+    ctx.arc(this.x,this.y,this.size,0,Math.PI*2);
+    ctx.fillStyle = "#ff9a9e";
+    ctx.fill();
+  }
+}
 
 const particles = [];
-const numParticles = 800;
-
-let mouse = { x: 0, y: 0, radius: 120 };
-let disturbed = false;
-let reformTimer = 0;
-
-function getHeartPosition(t, scale = 70) {
-    return {
-        x: 16 * Math.pow(Math.sin(t), 3) * scale,
-        y: -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t)) * scale
-    };
+for(let i=0;i<600;i++){
+  particles.push(new Particle());
 }
 
-class Particle {
-    constructor() {
-        this.angle = Math.random() * Math.PI * 2;
-        this.reset();
-    }
+function animate(){
+  ctx.fillStyle="rgba(0,0,0,0.2)";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
 
-    reset() {
-        const pos = getHeartPosition(this.angle);
-        this.x = canvas.width/2 + pos.x;
-        this.y = canvas.height/2 + pos.y;
-        this.vx = 0;
-        this.vy = 0;
-        this.size = 0.5 + Math.random() * 1.2;
-    }
+  particles.forEach(p=>{
+    p.update();
+    p.draw();
+  });
 
-    update() {
-        this.angle += 0.002;
-
-        const pos = getHeartPosition(this.angle, 70 + Math.sin(this.angle*2)*5);
-        const targetX = canvas.width/2 + pos.x;
-        const targetY = canvas.height/2 + pos.y;
-
-        let dx = this.x - mouse.x;
-        let dy = this.y - mouse.y;
-        let dist = Math.sqrt(dx*dx + dy*dy);
-
-        if (dist < mouse.radius && !disturbed) {
-            disturbed = true;
-            reformTimer = 200;
-            this.vx += (dx/dist) * 2.5;
-            this.vy += (dy/dist) * 2.5;
-        }
-
-        this.x += this.vx;
-        this.y += this.vy;
-
-        this.vx *= 0.96;
-        this.vy *= 0.96;
-
-        if (disturbed && reformTimer > 0) {
-            this.vx += (targetX - this.x) * 0.002;
-            this.vy += (targetY - this.y) * 0.002;
-            reformTimer--;
-            if (reformTimer <= 0) disturbed = false;
-        } else {
-            this.x += (targetX - this.x) * 0.02;
-            this.y += (targetY - this.y) * 0.02;
-        }
-    }
-
-    draw() {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
-        ctx.fillStyle = '#ff9a9e';
-        ctx.fill();
-    }
+  requestAnimationFrame(animate);
 }
 
-for (let i=0;i<numParticles;i++) {
-    particles.push(new Particle());
-}
+animate();
 
-canvas.addEventListener('mousemove', e => {
-    mouse.x = e.clientX;
-    mouse.y = e.clientY;
-});
-
-function loadImages() {
-    let loaded = 0;
-
-    imagePaths.forEach((src, i) => {
-        const img = new Image();
-        img.src = src;
-
-        img.onload = () => {
-            images[i] = img;
-            loaded++;
-            if (loaded === imagePaths.length) animate();
-        };
-    });
-}
-
-function animate() {
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-
-    if (images.length > 0) {
-        const img = images[currentImageIndex];
-
-        timer++;
-
-        if (timer > 200 && !fadingOut) {
-            fadingOut = true;
-        }
-
-        if (fadingOut) {
-            fadeAlpha -= 0.01;
-            if (fadeAlpha <= 0) {
-                currentImageIndex = (currentImageIndex + 1) % images.length;
-
-                bgFullImage.style.opacity = 0;
-
-                setTimeout(() => {
-                    bgFullImage.src = images[currentImageIndex].src;
-                    bgFullImage.style.opacity = 0.1;
-                }, 500);
-
-                fadingOut = false;
-                fadingIn = true;
-                timer = 0;
-            }
-        }
-
-        if (fadingIn) {
-            fadeAlpha += 0.01;
-            if (fadeAlpha >= 1) fadingIn = false;
-        }
-
-        ctx.globalAlpha = fadeAlpha;
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        ctx.globalAlpha = 1;
-    }
-
-    ctx.globalAlpha = 0.7;
-    particles.forEach(p => {
-        p.update();
-        p.draw();
-    });
-    ctx.globalAlpha = 1;
-
-    requestAnimationFrame(animate);
-}
-
-loadImages();
-
-window.addEventListener('resize', () => {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+window.addEventListener("resize",()=>{
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
 });
 </script>
 
