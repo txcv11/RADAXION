@@ -83,7 +83,7 @@ canvas {
 <canvas id="canvas"></canvas>
 
 <div id="text-container">
-  <div id="pofi-text">♾️ kadar huzurla uyu Pofimiz..</div>
+  <div id="pofi-text">♾️ kadar huzurla uyu Pofimiz.</div>
   <div id="text-sub"></div>
   <div id="text">Sen benim en güzel tesadüfümsün ❤️</div>
 </div>
@@ -109,7 +109,7 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 
-/* ===== RESİMLER (GARANTİLİ YÜKLEME) ===== */
+/* ===== RESİMLER ===== */
 const imageURLs = [
 "https://i.ibb.co/JW8RVvkY/image3.jpg",
 "https://i.ibb.co/Qj6vztzh/image2.jpg",
@@ -157,6 +157,7 @@ const imageURLs = [
 let images = [];
 let loaded = 0;
 let current = 0;
+let floatIndex = 0; // Kesin sıralama takibi için global sayaç
 
 const bg = document.getElementById("bg");
 
@@ -170,7 +171,6 @@ imageURLs.forEach((src, i) => {
 
     if (loaded === imageURLs.length) {
       bg.src = images[0].src;
-      // Resimler yüklenince akan galeri döngüsünü başlat
       startFloatingImages();
     }
   };
@@ -201,9 +201,14 @@ function createFloatingImage(side) {
   if (images.length === 0) return;
 
   const imgEl = document.createElement("img");
-  // Rastgele bir resim seç
-  const randomImg = images[Math.floor(Math.random() * images.length)];
-  imgEl.src = randomImg.src;
+  
+  // Asla şaşmayacak kesin sıralı index kullanımı
+  const sequentialImg = images[floatIndex];
+  imgEl.src = sequentialImg.src;
+  
+  // Sıradaki resme geç, liste biterse 0'a (en başa) sorunsuz dön
+  floatIndex = (floatIndex + 1) % images.length;
+  
   imgEl.className = "floating-img";
 
   // Konumlandırma (Sağ veya Sol şerit)
@@ -214,27 +219,25 @@ function createFloatingImage(side) {
     imgEl.style.right = `${Math.random() * 60 + padding}px`;
   }
 
-  // Başlangıç noktası (Ekranın altından başlar)
+  // Başlangıç noktası
   let posY = window.innerHeight + 50;
   imgEl.style.top = `${posY}px`;
   
-  // Rastgele hafif dönüş açısı
   const rotation = (Math.random() - 0.5) * 15; 
   imgEl.style.transform = `scale(0.9) rotate(${rotation}deg)`;
 
   document.body.appendChild(imgEl);
 
-  // Görünürlük ve hareket parametreleri
   let opacity = 0;
-  const speed = 0.6 + Math.random() * 0.5; // Yukarı akış hızı
+  // Sabit ve yavaş yukarı akış hızı
+  const speed = 0.3 + Math.random() * 0.2; 
 
   function stream() {
     posY -= speed;
     imgEl.style.top = `${posY}px`;
 
-    // Girişte yavaşça belirme, çıkışta yavaşça kaybolma (Üstten silinme efekti)
     if (posY > window.innerHeight - 200) {
-      opacity = Math.min(0.6, opacity + 0.02); // Maksimum 0.6 opaklık (arka planda zarif durması için)
+      opacity = Math.min(0.6, opacity + 0.02); 
     } else if (posY < 200) {
       opacity = Math.max(0, opacity - 0.015);
     } else {
@@ -250,7 +253,6 @@ function createFloatingImage(side) {
     }
   }
 
-  // Belirdikten sonra hafif büyüme efekti ile animasyonu başlat
   setTimeout(() => {
     imgEl.style.transform = `scale(1) rotate(${rotation}deg)`;
     requestAnimationFrame(stream);
@@ -259,16 +261,16 @@ function createFloatingImage(side) {
 
 function startFloatingImages() {
   // Sol taraf akışı
-  setInterval(() => createFloatingImage("left"), 5000);
-  // Sağ taraf akışı (Dengeli olmaları için gecikmeli başlar)
+  setInterval(() => createFloatingImage("left"), 6000);
+  // Sağ taraf akışı
   setTimeout(() => {
-    setInterval(() => createFloatingImage("right"), 5000);
-  }, 2500);
+    setInterval(() => createFloatingImage("right"), 6000);
+  }, 3000);
 }
 
 
 /* ===== KALP ===== */
-function heart(t, s = 8) { // KÜÇÜK
+function heart(t, s = 8) { 
   return {
     x: 16 * Math.pow(Math.sin(t), 3) * s,
     y: -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t)) * s
