@@ -83,7 +83,7 @@ canvas {
 <canvas id="canvas"></canvas>
 
 <div id="text-container">
-  <div id="pofi-text">♾️ kadar huzurla uyu Pofimiz.</div>
+  <div id="pofi-text">♾️ kadar huzurla uyu Pofimiz..</div>
   <div id="text-sub"></div>
   <div id="text">Sen benim en güzel tesadüfümsün ❤️</div>
 </div>
@@ -151,13 +151,32 @@ const imageURLs = [
 "https://i.ibb.co/B2r7J5D6/image37.jpg",
 "https://i.ibb.co/YFn36XW6/image38.jpg",
 "https://i.ibb.co/Q3gc5d8x/image39.jpg",
-"https://i.ibb.co/Jwycrvg7/image40.jpg"
+"https://i.ibb.co/Jwycrvg7/image40.jpg",
+"https://i.ibb.co/WNLC3WtZ/image41.jpg",
+"https://i.ibb.co/LdL3W2qj/image42.jpg",
+"https://i.ibb.co/LzCcCWd9/image43.jpg",
+"https://i.ibb.co/Q3rHxWGm/image44.jpg",
+"https://i.ibb.co/zWfjvcbp/image45.jpg",
+"https://i.ibb.co/tPPh2rhL/image46.jpg",
+"https://i.ibb.co/1YhRHvTk/image47.jpg",
+"https://i.ibb.co/B2r7J5D6/image48.jpg",
+"https://i.ibb.co/Y7gR017M/image49.jpg",
+"https://i.ibb.co/8nTpr2nL/image50.jpg",
+"https://i.ibb.co/hx1Cpnh0/image51.jpg",
+"https://i.ibb.co/tpNvfJ15/image52.jpg",
+"https://i.ibb.co/cS2pD1NY/image53.jpg",
+"https://i.ibb.co/LfxZVpL/image54.jpg",
+"https://i.ibb.co/xbbydqJ/image55.jpg",
+"https://i.ibb.co/5gQ9rqX0/image56.jpg",
+"https://i.ibb.co/1fRgtm4C/image57.jpg",
+"https://i.ibb.co/cKVT5cLd/image58.jpg",
+"https://i.ibb.co/CsPW60qt/image59.jpg"
 ];
 
 let images = [];
 let loaded = 0;
 let current = 0;
-let floatIndex = 0; // Kesin sıralama takibi için global sayaç
+let floatIndex = 0; // Sıralama takibi için global sayaç
 
 const bg = document.getElementById("bg");
 
@@ -202,11 +221,11 @@ function createFloatingImage(side) {
 
   const imgEl = document.createElement("img");
   
-  // Asla şaşmayacak kesin sıralı index kullanımı
+  // Kesin sıralı index kullanımı
   const sequentialImg = images[floatIndex];
   imgEl.src = sequentialImg.src;
   
-  // Sıradaki resme geç, liste biterse 0'a (en başa) sorunsuz dön
+  // Sıradaki resme geç, liste biterse 0'a sorunsuz dön
   floatIndex = (floatIndex + 1) % images.length;
   
   imgEl.className = "floating-img";
