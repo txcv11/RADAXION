@@ -174,11 +174,25 @@ const imageURLs = [
 ];
 
 let images = [];
+let shuffledImages = []; // Karıştırılmış resimlerin tutulacağı havuz
 let loaded = 0;
 let current = 0;
-let floatIndex = 0; // Sıralama takibi için global sayaç
+let floatIndex = 0; 
 
 const bg = document.getElementById("bg");
+
+// Resimleri Kusursuz Karıştırma Algoritması (Fisher-Yates)
+function shuffleArray(array) {
+  let currentIndex = array.length, randomIndex;
+  const newArray = [...array];
+
+  while (currentIndex !== 0) {
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+    [newArray[currentIndex], newArray[randomIndex]] = [newArray[randomIndex], newArray[currentIndex]];
+  }
+  return newArray;
+}
 
 imageURLs.forEach((src, i) => {
   const img = new Image();
@@ -190,6 +204,8 @@ imageURLs.forEach((src, i) => {
 
     if (loaded === imageURLs.length) {
       bg.src = images[0].src;
+      // İlk yüklemede havuzu karıştır ve akışı başlat
+      shuffledImages = shuffleArray(images);
       startFloatingImages();
     }
   };
@@ -217,16 +233,20 @@ setInterval(() => {
 
 /* ===== SAĞ/SOL AKAN MODERN FOTOĞRAFLAR ===== */
 function createFloatingImage(side) {
-  if (images.length === 0) return;
+  if (shuffledImages.length === 0) return;
 
   const imgEl = document.createElement("img");
   
-  // Kesin sıralı index kullanımı
-  const sequentialImg = images[floatIndex];
+  // Karıştırılmış havuzdan sırayla resmi çek
+  const sequentialImg = shuffledImages[floatIndex];
   imgEl.src = sequentialImg.src;
   
-  // Sıradaki resme geç, liste biterse 0'a sorunsuz dön
-  floatIndex = (floatIndex + 1) % images.length;
+  // İndexi arttır, eğer havuzdaki tüm resimler (60 adet) bittiyse listeyi yeniden karıştır ve sıfırla
+  floatIndex++;
+  if (floatIndex >= shuffledImages.length) {
+    shuffledImages = shuffleArray(images);
+    floatIndex = 0;
+  }
   
   imgEl.className = "floating-img";
 
