@@ -9,6 +9,7 @@ body {
   margin: 0;
   background: #000;
   overflow: hidden;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
 /* ARKA PLAN */
@@ -20,6 +21,7 @@ body {
   opacity: 0.2;
   filter: blur(8px);
   transition: opacity 1s;
+  z-index: 0;
 }
 
 /* CANVAS */
@@ -27,17 +29,50 @@ canvas {
   position: absolute;
   top: 0;
   left: 0;
+  z-index: 1;
 }
 
-/* YAZI */
-#text {
+/* MODERN ANMA VE ALT YAZI ALANI */
+#text-container {
   position: absolute;
   bottom: 40px;
   width: 100%;
   text-align: center;
+  z-index: 3;
+  pointer-events: none;
+}
+
+#pofi-text {
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 300;
+  letter-spacing: 2px;
+  opacity: 0.6;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+#text {
   color: #ff9a9e;
   font-size: 18px;
-  opacity: 0.8;
+  letter-spacing: 1px;
+  opacity: 0.9;
+}
+
+/* AKAN FOTOĞRAFLAR */
+.floating-img {
+  position: absolute;
+  width: 120px;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0;
+  transform: scale(0.9) rotate(0deg);
+  transition: opacity 1s ease, transform 0.5s ease;
 }
 </style>
 </head>
@@ -46,7 +81,12 @@ canvas {
 
 <img id="bg">
 <canvas id="canvas"></canvas>
-<div id="text">Sen benim en güzel tesadüfümsün ❤️ , Doğum günün kutlu olsun bebeğim..</div>
+
+<div id="text-container">
+  <div id="pofi-text">Sonsuza kadar huzurla Pofimiz..</div>
+  <div id="text-sub"></div>
+  <div id="text">Sen benim en güzel tesadüfümsün ❤️</div>
+</div>
 
 <audio id="music" loop>
   <source src="https://files.catbox.moe/wxukv3.mp3" type="audio/mpeg">
@@ -93,6 +133,8 @@ imageURLs.forEach((src, i) => {
 
     if (loaded === imageURLs.length) {
       bg.src = images[0].src;
+      // Resimler yüklenince akan galeri döngüsünü başlat
+      startFloatingImages();
     }
   };
 
@@ -115,6 +157,77 @@ setInterval(() => {
   }, 500);
 
 }, 4000);
+
+
+/* ===== SAĞ/SOL AKAN MODERN FOTOĞRAFLAR ===== */
+function createFloatingImage(side) {
+  if (images.length === 0) return;
+
+  const imgEl = document.createElement("img");
+  // Rastgele bir resim seç
+  const randomImg = images[Math.floor(Math.random() * images.length)];
+  imgEl.src = randomImg.src;
+  imgEl.className = "floating-img";
+
+  // Konumlandırma (Sağ veya Sol şerit)
+  const padding = 40; 
+  if (side === "left") {
+    imgEl.style.left = `${Math.random() * 60 + padding}px`;
+  } else {
+    imgEl.style.right = `${Math.random() * 60 + padding}px`;
+  }
+
+  // Başlangıç noktası (Ekranın altından başlar)
+  let posY = window.innerHeight + 50;
+  imgEl.style.top = `${posY}px`;
+  
+  // Rastgele hafif dönüş açısı
+  const rotation = (Math.random() - 0.5) * 15; 
+  imgEl.style.transform = `scale(0.9) rotate(${rotation}deg)`;
+
+  document.body.appendChild(imgEl);
+
+  // Görünürlük ve hareket parametreleri
+  let opacity = 0;
+  const speed = 0.6 + Math.random() * 0.5; // Yukarı akış hızı
+
+  function stream() {
+    posY -= speed;
+    imgEl.style.top = `${posY}px`;
+
+    // Girişte yavaşça belirme, çıkışta yavaşça kaybolma (Üstten silinme efekti)
+    if (posY > window.innerHeight - 200) {
+      opacity = Math.min(0.6, opacity + 0.02); // Maksimum 0.6 opaklık (arka planda zarif durması için)
+    } else if (posY < 200) {
+      opacity = Math.max(0, opacity - 0.015);
+    } else {
+      opacity = 0.6;
+    }
+    
+    imgEl.style.opacity = opacity;
+
+    if (posY > -200 && opacity >= 0) {
+      requestAnimationFrame(stream);
+    } else {
+      imgEl.remove();
+    }
+  }
+
+  // Belirdikten sonra hafif büyüme efekti ile animasyonu başlat
+  setTimeout(() => {
+    imgEl.style.transform = `scale(1) rotate(${rotation}deg)`;
+    requestAnimationFrame(stream);
+  }, 50);
+}
+
+function startFloatingImages() {
+  // Sol taraf akışı
+  setInterval(() => createFloatingImage("left"), 5000);
+  // Sağ taraf akışı (Dengeli olmaları için gecikmeli başlar)
+  setTimeout(() => {
+    setInterval(() => createFloatingImage("right"), 5000);
+  }, 2500);
+}
 
 
 /* ===== KALP ===== */
